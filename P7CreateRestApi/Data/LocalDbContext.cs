@@ -13,5 +13,6 @@ namespace Dot.Net.WebApi.Data
         }
 
         public DbSet<User> Users { get; set;}
+        //// TODO: nouveaux dbsets à rajouter en suivant les modlèes
     }
 }
