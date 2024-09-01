@@ -7,7 +7,7 @@ namespace Dot.Net.WebApi.Controllers
     [Route("[controller]")]
     public class BidListController : ControllerBase
     {
-        [HttpGet]
+        [HttpPut]
         [Route("validate")]
         public IActionResult Validate([FromBody] BidList bidList)
         {
@@ -22,7 +22,7 @@ namespace Dot.Net.WebApi.Controllers
             return Ok();
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("update/{id}")]
         public IActionResult UpdateBid(int id, [FromBody] BidList bidList)
         {

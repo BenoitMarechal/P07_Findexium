@@ -16,14 +16,14 @@ namespace Dot.Net.WebApi.Controllers
             return Ok();
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("add")]
         public IActionResult AddCurvePoint([FromBody]CurvePoint curvePoint)
         {
             return Ok();
         }
 
-        [HttpGet]
+        [HttpPut]
         [Route("validate")]
         public IActionResult Validate([FromBody]CurvePoint curvePoint)
         {
@@ -39,7 +39,7 @@ namespace Dot.Net.WebApi.Controllers
             return Ok();
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("update/{id}")]
         public IActionResult UpdateCurvePoint(int id, [FromBody] CurvePoint curvePoint)
         {

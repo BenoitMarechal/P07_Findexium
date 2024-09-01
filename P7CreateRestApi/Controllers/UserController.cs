@@ -22,14 +22,14 @@ namespace Dot.Net.WebApi.Controllers
             return Ok();
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("add")]
         public IActionResult AddUser([FromBody]User user)
         {
             return Ok();
         }
 
-        [HttpGet]
+        [HttpPut]
         [Route("validate")]
         public IActionResult Validate([FromBody]User user)
         {
@@ -55,7 +55,7 @@ namespace Dot.Net.WebApi.Controllers
             return Ok();
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("update/{id}")]
         public IActionResult UpdateUser(int id, [FromBody] User user)
         {

@@ -16,14 +16,14 @@ namespace Dot.Net.WebApi.Controllers
             return Ok();
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("add")]
         public IActionResult AddRuleName([FromBody]RuleName trade)
         {
             return Ok();
         }
 
-        [HttpGet]
+        [HttpPut]
         [Route("validate")]
         public IActionResult Validate([FromBody]RuleName trade)
         {
@@ -39,7 +39,7 @@ namespace Dot.Net.WebApi.Controllers
             return Ok();
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("update/{id}")]
         public IActionResult UpdateRuleName(int id, [FromBody] RuleName rating)
         {

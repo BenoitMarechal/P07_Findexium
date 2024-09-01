@@ -17,14 +17,14 @@ namespace Dot.Net.WebApi.Controllers
             return Ok();
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("add")]
         public IActionResult AddTrade([FromBody]Trade trade)
         {
             return Ok();
         }
 
-        [HttpGet]
+        [HttpPut]
         [Route("validate")]
         public IActionResult Validate([FromBody]Trade trade)
         {
@@ -40,7 +40,7 @@ namespace Dot.Net.WebApi.Controllers
             return Ok();
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("update/{id}")]
         public IActionResult UpdateTrade(int id, [FromBody] Trade trade)
         {

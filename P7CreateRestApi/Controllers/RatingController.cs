@@ -26,14 +26,14 @@ namespace Dot.Net.WebApi.Controllers
             return await _context.Ratings.ToListAsync();
         }
 
-        [HttpGet]
+        [HttpPost]
         [Route("add")]
         public IActionResult AddRatingForm([FromBody]Rating rating)
         {
             return Ok();
         }
 
-        [HttpGet]
+        [HttpPut]
         [Route("validate")]
         public IActionResult Validate([FromBody]Rating rating)
         {
@@ -49,7 +49,7 @@ namespace Dot.Net.WebApi.Controllers
             return Ok();
         }
 
-        [HttpPost]
+        [HttpPut]
         [Route("update/{id}")]
         public IActionResult UpdateRating(int id, [FromBody] Rating rating)
         {
