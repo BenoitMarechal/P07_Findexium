@@ -1,5 +1,7 @@
 using Dot.Net.WebApi.Controllers.Domain;
+using Dot.Net.WebApi.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dot.Net.WebApi.Controllers
 {
