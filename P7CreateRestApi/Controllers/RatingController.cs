@@ -8,13 +8,20 @@ namespace Dot.Net.WebApi.Controllers
     public class RatingController : ControllerBase
     {
         // TODO: Inject Rating service
+        private readonly LocalDbContext _context;
+
+        public RatingController(LocalDbContext context)
+        {
+            _context = context;
+        }      
+
 
         [HttpGet]
         [Route("list")]
-        public IActionResult Home()
+        public async Task<ActionResult<IEnumerable<Rating>>> Home()
         {
             // TODO: find all Rating, add to model
-            return Ok();
+            return await _context.Ratings.ToListAsync();
         }
 
         [HttpGet]
