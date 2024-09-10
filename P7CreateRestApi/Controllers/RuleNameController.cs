@@ -1,3 +1,4 @@
+using Dot.Net.WebApi.Data;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Dot.Net.WebApi.Controllers
@@ -7,6 +8,12 @@ namespace Dot.Net.WebApi.Controllers
     public class RuleNameController : ControllerBase
     {
         // TODO: Inject RuleName service
+        private readonly LocalDbContext _context;
+
+        public RuleNameController(LocalDbContext context)
+        {
+            _context = context;
+        }
 
         [HttpGet]
         [Route("list")]

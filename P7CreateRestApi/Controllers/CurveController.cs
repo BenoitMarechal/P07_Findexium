@@ -1,5 +1,7 @@
+using Dot.Net.WebApi.Data;
 using Dot.Net.WebApi.Domain;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Dot.Net.WebApi.Controllers
 {
@@ -8,12 +10,18 @@ namespace Dot.Net.WebApi.Controllers
     public class CurveController : ControllerBase
     {
         // TODO: Inject Curve Point service
+        private readonly LocalDbContext _context;
+
+        public CurveController(LocalDbContext context)
+        {
+            _context = context;
+        }
 
         [HttpGet]
         [Route("list")]
-        public IActionResult Home()
+        public async Task<ActionResult<IEnumerable<CurvePoint>>> Home()
         {
-            return Ok();
+            return await _context.CurvePoints.ToListAsync();
         }
 
         [HttpPost]

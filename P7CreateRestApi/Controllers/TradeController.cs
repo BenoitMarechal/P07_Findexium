@@ -1,3 +1,4 @@
+using Dot.Net.WebApi.Data;
 using Dot.Net.WebApi.Domain;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +9,12 @@ namespace Dot.Net.WebApi.Controllers
     public class TradeController : ControllerBase
     {
         // TODO: Inject Trade service
+        private readonly LocalDbContext _context;
+
+        public TradeController(LocalDbContext context)
+        {
+            _context = context;
+        }
 
         [HttpGet]
         [Route("list")]

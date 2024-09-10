@@ -1,3 +1,4 @@
+using Dot.Net.WebApi.Data;
 using Dot.Net.WebApi.Domain;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,6 +8,12 @@ namespace Dot.Net.WebApi.Controllers
     [Route("[controller]")]
     public class BidListController : ControllerBase
     {
+        private readonly LocalDbContext _context;
+
+        public BidListController(LocalDbContext context)
+        {
+            _context = context;
+        }
         [HttpPut]
         [Route("validate")]
         public IActionResult Validate([FromBody] BidList bidList)
