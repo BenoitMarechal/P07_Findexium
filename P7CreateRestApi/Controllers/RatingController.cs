@@ -18,23 +18,18 @@ namespace Dot.Net.WebApi.Controllers
         }      
 
         [HttpPost]
-        // [Route("add")]
-        public async Task<IActionResult> AddRatingForm([FromBody]Rating rating)
+        public async Task<IActionResult> AddRating([FromBody]Rating rating)
         {
             _context.Ratings.Add(rating);
             await _context.SaveChangesAsync();
-            // CreatedAtAction(nameof(CreateAsync_ActionResultOfT), new { id = product.Id }, product)
             return CreatedAtAction(nameof(GetRating), new { id= rating.Id}, rating);
 
-            
-            //return Ok();
         }
-        [HttpGet]
-        //[Route("api/V1/ratings")]
-        public async Task<ActionResult<IEnumerable<Rating>>> GetAllRatings()
-        {
 
-            // TODO: find all Ratings, add to model
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Rating>>> GetAllRatings()
+        {  
             return await _context.Ratings.ToListAsync();
         }
 
@@ -43,13 +38,8 @@ namespace Dot.Net.WebApi.Controllers
         [Route("{id}")]
         public async Task<IActionResult> GetRating(int id)
         {
-
-            if (id == null)
-            {
-                return NotFound();
-            }
             // TODO: find all Rating, add to model
-            var rating= await _context.Ratings.FirstOrDefaultAsync(r => r.Id==id);
+            var rating= await _context.Ratings.FindAsync(id);
             if(rating == null)
             {
                 return NotFound();
@@ -104,14 +94,6 @@ namespace Dot.Net.WebApi.Controllers
 
             return NoContent();
         }
-
-
-
-
-
-
-
-
 
 
         private bool RatingExists(int id)

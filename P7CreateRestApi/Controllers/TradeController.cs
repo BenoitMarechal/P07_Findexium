@@ -1,11 +1,12 @@
 using Dot.Net.WebApi.Data;
-using Dot.Net.WebApi.Domain;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Dot.Net.WebApi.Domain;
 
 namespace Dot.Net.WebApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/v1/[controller]")]
     public class TradeController : ControllerBase
     {
         // TODO: Inject Trade service
@@ -16,51 +17,89 @@ namespace Dot.Net.WebApi.Controllers
             _context = context;
         }
 
+        [HttpPost]
+        public async Task<IActionResult> AddTrade([FromBody] Trade trade)
+        {
+            _context.Trades.Add(trade);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetTrade), new { id = trade.TradeId }, trade);
+
+        }
+
+
         [HttpGet]
-        [Route("list")]
-        public IActionResult Home()
+        public async Task<ActionResult<IEnumerable<Trade>>> GetAllTrades()
+        {
+            return await _context.Trades.ToListAsync();
+        }
+
+
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<IActionResult> GetTrade(int id)
         {
             // TODO: find all Trade, add to model
-            return Ok();
+            var trade = await _context.Trades.FindAsync(id);
+            if (trade == null)
+            {
+                return NotFound();
+            }
+            return Ok(trade);
         }
 
-        [HttpPost]
-        [Route("add")]
-        public IActionResult AddTrade([FromBody]Trade trade)
-        {
-            return Ok();
-        }
-
-        [HttpPut]
-        [Route("validate")]
-        public IActionResult Validate([FromBody]Trade trade)
-        {
-            // TODO: check data valid and save to db, after saving return Trade list
-            return Ok();
-        }
-
-        [HttpGet]
-        [Route("update/{id}")]
-        public IActionResult ShowUpdateForm(int id)
-        {
-            // TODO: get Trade by Id and to model then show to the form
-            return Ok();
-        }
 
         [HttpPut]
-        [Route("update/{id}")]
-        public IActionResult UpdateTrade(int id, [FromBody] Trade trade)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateTrade(int id, [FromBody] Trade trade)
         {
-            // TODO: check required fields, if valid call service to update Trade and return Trade list
-            return Ok();
+            if (id != trade.TradeId)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(trade).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!TradeExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
+
 
         [HttpDelete]
         [Route("{id}")]
-        public IActionResult DeleteTrade(int id)
+        public async Task<IActionResult> DeleteTrade(int id)
         {
-            // TODO: Find Trade by Id and delete the Trade, return to Trade list
-            return Ok();
+            var trade = await _context.Trades.FindAsync(id);
+            if (trade == null)
+            {
+                return NotFound();
+            }
+
+            _context.Trades.Remove(trade);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
+
+
+        private bool TradeExists(int id)
+        {
+            return _context.Trades.Any(e => e.TradeId == id);
+        }
+
     }
 }

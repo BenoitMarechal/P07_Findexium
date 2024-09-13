@@ -1,85 +1,105 @@
-using Dot.Net.WebApi.Domain;
-using Dot.Net.WebApi.Repositories;
+using Dot.Net.WebApi.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Dot.Net.WebApi.Domain;
 
 namespace Dot.Net.WebApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/v1/[controller]")]
     public class UserController : ControllerBase
     {
-        private UserRepository _userRepository;
+        // TODO: Inject User service
+        private readonly LocalDbContext _context;
 
-        public UserController(UserRepository userRepository)
+        public UserController(LocalDbContext context)
         {
-            _userRepository = userRepository;
-        }
-
-        [HttpGet]
-        [Route("list")]
-        public IActionResult Home()
-        {
-            return Ok();
+            _context = context;
         }
 
         [HttpPost]
-        [Route("add")]
-        public IActionResult AddUser([FromBody]User user)
+        public async Task<IActionResult> AddUser([FromBody] User user)
         {
-            return Ok();
+            _context.Users.Add(user);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+
         }
 
-        [HttpPut]
-        [Route("validate")]
-        public IActionResult Validate([FromBody]User user)
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
         {
-            if (!ModelState.IsValid)
+            return await _context.Users.ToListAsync();
+        }
+
+
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<IActionResult> GetUser(int id)
+        {
+            // TODO: find all User, add to model
+            var user = await _context.Users.FindAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            return Ok(user);
+        }
+
+
+        [HttpPut]
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] User user)
+        {
+            if (id != user.Id)
             {
                 return BadRequest();
             }
-           
-           _userRepository.Add(user);
 
-            return Ok();
+            _context.Entry(user).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!UserExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
 
-        [HttpGet]
-        [Route("update/{id}")]
-        public IActionResult ShowUpdateForm(int id)
-        {
-            User user = _userRepository.FindById(id);
-            
-            if (user == null)
-                throw new ArgumentException("Invalid user Id:" + id);
-
-            return Ok();
-        }
-
-        [HttpPut]
-        [Route("update/{id}")]
-        public IActionResult UpdateUser(int id, [FromBody] User user)
-        {
-            // TODO: check required fields, if valid call service to update Trade and return Trade list
-            return Ok();
-        }
 
         [HttpDelete]
         [Route("{id}")]
-        public IActionResult DeleteUser(int id)
+        public async Task<IActionResult> DeleteUser(int id)
         {
-            User user = _userRepository.FindById(id);
-            
+            var user = await _context.Users.FindAsync(id);
             if (user == null)
-                throw new ArgumentException("Invalid user Id:" + id);
+            {
+                return NotFound();
+            }
 
-            return Ok();
+            _context.Users.Remove(user);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
 
-        [HttpGet]
-        [Route("/secure/article-details")]
-        public async Task<ActionResult<List<User>>> GetAllUserArticles()
+
+        private bool UserExists(int id)
         {
-            return Ok();
+            return _context.Users.Any(e => e.Id == id);
         }
+
     }
 }
