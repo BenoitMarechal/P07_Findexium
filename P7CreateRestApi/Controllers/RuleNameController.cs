@@ -1,10 +1,12 @@
 using Dot.Net.WebApi.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Dot.Net.WebApi.Domain;
 
 namespace Dot.Net.WebApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/v1/[controller]")]
     public class RuleNameController : ControllerBase
     {
         // TODO: Inject RuleName service
@@ -15,51 +17,89 @@ namespace Dot.Net.WebApi.Controllers
             _context = context;
         }
 
+        [HttpPost]
+        public async Task<IActionResult> AddRuleName([FromBody] RuleName ruleName)
+        {
+            _context.RuleNames.Add(ruleName);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetRuleName), new { id = ruleName.Id }, ruleName);
+
+        }
+
+
         [HttpGet]
-        [Route("list")]
-        public IActionResult Home()
+        public async Task<ActionResult<IEnumerable<RuleName>>> GetAllRuleNames()
+        {
+            return await _context.RuleNames.ToListAsync();
+        }
+
+
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<IActionResult> GetRuleName(int id)
         {
             // TODO: find all RuleName, add to model
-            return Ok();
+            var ruleName = await _context.RuleNames.FindAsync(id);
+            if (ruleName == null)
+            {
+                return NotFound();
+            }
+            return Ok(ruleName);
         }
 
-        [HttpPost]
-        [Route("add")]
-        public IActionResult AddRuleName([FromBody]RuleName trade)
-        {
-            return Ok();
-        }
-
-        [HttpPut]
-        [Route("validate")]
-        public IActionResult Validate([FromBody]RuleName trade)
-        {
-            // TODO: check data valid and save to db, after saving return RuleName list
-            return Ok();
-        }
-
-        [HttpGet]
-        [Route("update/{id}")]
-        public IActionResult ShowUpdateForm(int id)
-        {
-            // TODO: get RuleName by Id and to model then show to the form
-            return Ok();
-        }
 
         [HttpPut]
-        [Route("update/{id}")]
-        public IActionResult UpdateRuleName(int id, [FromBody] RuleName rating)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateRuleName(int id, [FromBody] RuleName ruleName)
         {
-            // TODO: check required fields, if valid call service to update RuleName and return RuleName list
-            return Ok();
+            if (id != ruleName.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(ruleName).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!RuleNameExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
+
 
         [HttpDelete]
         [Route("{id}")]
-        public IActionResult DeleteRuleName(int id)
+        public async Task<IActionResult> DeleteRuleName(int id)
         {
-            // TODO: Find RuleName by Id and delete the RuleName, return to Rule list
-            return Ok();
+            var ruleName = await _context.RuleNames.FindAsync(id);
+            if (ruleName == null)
+            {
+                return NotFound();
+            }
+
+            _context.RuleNames.Remove(ruleName);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
+
+
+        private bool RuleNameExists(int id)
+        {
+            return _context.RuleNames.Any(e => e.Id == id);
+        }
+
     }
 }

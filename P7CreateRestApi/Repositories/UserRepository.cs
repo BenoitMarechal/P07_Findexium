@@ -8,10 +8,13 @@ namespace Dot.Net.WebApi.Repositories
     {
         public LocalDbContext DbContext { get; }
 
+
+
         public UserRepository(LocalDbContext dbContext)
         {
             DbContext = dbContext;
         }
+
 
         public User FindByUserName(string userName)
         {

@@ -1,66 +1,105 @@
 using Dot.Net.WebApi.Data;
-using Dot.Net.WebApi.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Dot.Net.WebApi.Domain;
 
 namespace Dot.Net.WebApi.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
-    public class CurveController : ControllerBase
+    [Route("api/v1/[controller]")]
+    public class CurvePointController : ControllerBase
     {
-        // TODO: Inject Curve Point service
+        // TODO: Inject CurvePoint service
         private readonly LocalDbContext _context;
 
-        public CurveController(LocalDbContext context)
+        public CurvePointController(LocalDbContext context)
         {
             _context = context;
         }
 
+        [HttpPost]
+        public async Task<IActionResult> AddCurvePoint([FromBody] CurvePoint curvePoint)
+        {
+            _context.CurvePoints.Add(curvePoint);
+            await _context.SaveChangesAsync();
+            return CreatedAtAction(nameof(GetCurvePoint), new { id = curvePoint.Id }, curvePoint);
+
+        }
+
+
         [HttpGet]
-        [Route("list")]
-        public async Task<ActionResult<IEnumerable<CurvePoint>>> Home()
+        public async Task<ActionResult<IEnumerable<CurvePoint>>> GetAllCurvePoints()
         {
             return await _context.CurvePoints.ToListAsync();
         }
 
-        [HttpPost]
-        [Route("add")]
-        public IActionResult AddCurvePoint([FromBody]CurvePoint curvePoint)
-        {
-            return Ok();
-        }
-
-        [HttpPut]
-        [Route("validate")]
-        public IActionResult Validate([FromBody]CurvePoint curvePoint)
-        {
-            // TODO: check data valid and save to db, after saving return bid list
-            return Ok();
-        }
 
         [HttpGet]
-        [Route("update/{id}")]
-        public IActionResult ShowUpdateForm(int id)
+        [Route("{id}")]
+        public async Task<IActionResult> GetCurvePoint(int id)
         {
-            // TODO: get CurvePoint by Id and to model then show to the form
-            return Ok();
+            // TODO: find all CurvePoint, add to model
+            var curvePoint = await _context.CurvePoints.FindAsync(id);
+            if (curvePoint == null)
+            {
+                return NotFound();
+            }
+            return Ok(curvePoint);
         }
 
+
         [HttpPut]
-        [Route("update/{id}")]
-        public IActionResult UpdateCurvePoint(int id, [FromBody] CurvePoint curvePoint)
+        [Route("{id}")]
+        public async Task<IActionResult> UpdateCurvePoint(int id, [FromBody] CurvePoint curvePoint)
         {
-            // TODO: check required fields, if valid call service to update Curve and return Curve list
-            return Ok();
+            if (id != curvePoint.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(curvePoint).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!CurvePointExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
         }
+
 
         [HttpDelete]
         [Route("{id}")]
-        public IActionResult DeleteBid(int id)
+        public async Task<IActionResult> DeleteCurvePoint(int id)
         {
-            // TODO: Find Curve by Id and delete the Curve, return to Curve list
-            return Ok();
+            var curvePoint = await _context.CurvePoints.FindAsync(id);
+            if (curvePoint == null)
+            {
+                return NotFound();
+            }
+
+            _context.CurvePoints.Remove(curvePoint);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
         }
+
+
+        private bool CurvePointExists(int id)
+        {
+            return _context.CurvePoints.Any(e => e.Id == id);
+        }
+
     }
 }
