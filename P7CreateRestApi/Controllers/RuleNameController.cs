@@ -1,7 +1,10 @@
+using Dot.Net.WebApi.Controllers.Domain;
 using Dot.Net.WebApi.Data;
+using Dot.Net.WebApi.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Dot.Net.WebApi.Domain;
+using P7CreateRestApi.Services;
+using P7CreateRestApi.Repositories;
 
 namespace Dot.Net.WebApi.Controllers
 {
@@ -9,97 +12,133 @@ namespace Dot.Net.WebApi.Controllers
     [Route("api/v1/[controller]")]
     public class RuleNameController : ControllerBase
     {
-        // TODO: Inject RuleName service
-        private readonly LocalDbContext _context;
+        private readonly RuleNameService _service;
+        private readonly ILogger<RuleNameController> _logger;
 
-        public RuleNameController(LocalDbContext context)
+        public RuleNameController(RuleNameService service, ILogger<RuleNameController> logger)
         {
-            _context = context;
+            _service = service;
+            _logger = logger;
         }
 
+        // POST: api/v1/bidlist
         [HttpPost]
         public async Task<IActionResult> AddRuleName([FromBody] RuleName ruleName)
         {
-            _context.RuleNames.Add(ruleName);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetRuleName), new { id = ruleName.Id }, ruleName);
-
+            try
+            {
+                await _service.Add(ruleName);
+                return CreatedAtAction(nameof(GetRuleName), new { id = ruleName.Id }, ruleName);
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "A database error occurred while adding the RuleName.");
+                return StatusCode(500, "A database error occurred while adding the RuleName.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                return StatusCode(500, "An unexpected error occurred while processing your request.");
+            }
         }
 
-
+        // GET: api/v1/bidlist
         [HttpGet]
         public async Task<ActionResult<IEnumerable<RuleName>>> GetAllRuleNames()
         {
-            return await _context.RuleNames.ToListAsync();
+            try
+            {
+                var result = await _service.GetAll();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                return StatusCode(500, "An unexpected error occurred while processing your request.");
+            }
         }
 
-
-        [HttpGet]
-        [Route("{id}")]
+        // GET: api/v1/bidlist/{id}
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetRuleName(int id)
         {
-            // TODO: find all RuleName, add to model
-            var ruleName = await _context.RuleNames.FindAsync(id);
-            if (ruleName == null)
+            try
             {
-                return NotFound();
+                var ruleName = await _service.GetById(id);
+                return Ok(ruleName);
             }
-            return Ok(ruleName);
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogError(ex, $"RuleName with ID {id} not found.");
+                return NotFound($"RuleName with ID {id} not found.");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "A database error occurred while fetching the RuleName.");
+                return StatusCode(500, "A database error occurred while fetching the RuleName.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                return StatusCode(500, "An unexpected error occurred while processing your request.");
+            }
         }
 
-
-        [HttpPut]
-        [Route("{id}")]
+        // PUT: api/v1/bidlist/{id}
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateRuleName(int id, [FromBody] RuleName ruleName)
         {
             if (id != ruleName.Id)
             {
-                return BadRequest();
+                return BadRequest("The ID from the route and the ID in the body do not match.");
             }
-
-            _context.Entry(ruleName).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _service.Update(ruleName);
+                return Ok();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (KeyNotFoundException ex)
             {
-                if (!RuleNameExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                _logger.LogError(ex, $"RuleName with ID {id} not found.");
+                return NotFound($"RuleName with ID {id} not found.");
             }
-
-            return NoContent();
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "A database error occurred while updating the RuleName.");
+                return StatusCode(500, "A database error occurred while updating the RuleName.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                return StatusCode(500, "An unexpected error occurred while processing your request.");
+            }
         }
 
-
-        [HttpDelete]
-        [Route("{id}")]
+        // DELETE: api/v1/bidlist/{id}
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRuleName(int id)
         {
-            var ruleName = await _context.RuleNames.FindAsync(id);
-            if (ruleName == null)
+            try
             {
-                return NotFound();
+                await _service.Delete(id);
+                return NoContent();
             }
-
-            _context.RuleNames.Remove(ruleName);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogError(ex, $"RuleName with ID {id} not found.");
+                return NotFound($"RuleName with ID {id} not found.");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "A database error occurred while deleting the RuleName.");
+                return StatusCode(500, "A database error occurred while deleting the RuleName.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                return StatusCode(500, "An unexpected error occurred while processing your request.");
+            }
         }
-
-
-        private bool RuleNameExists(int id)
-        {
-            return _context.RuleNames.Any(e => e.Id == id);
-        }
-
     }
 }

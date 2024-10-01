@@ -1,39 +1,58 @@
+﻿using Dot.Net.WebApi.Controllers.Domain;
 using Dot.Net.WebApi.Data;
 using Dot.Net.WebApi.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace Dot.Net.WebApi.Repositories
+namespace P7CreateRestApi.Repositories
 {
-    public class UserRepository
+    public class UserRepository : IRepository<User>
     {
-        public LocalDbContext DbContext { get; }
+        private readonly LocalDbContext _context;
+        private readonly ILogger<UserRepository> _logger;
 
 
-
-        public UserRepository(LocalDbContext dbContext)
+        public UserRepository(LocalDbContext context, ILogger<UserRepository> logger)
         {
-            DbContext = dbContext;
+            _context = context;
+            _logger = logger;
+        }
+
+        public async Task Add(User entity)
+        {
+            _context.Users.Add(entity);
+            await _context.SaveChangesAsync();
         }
 
 
-        public User FindByUserName(string userName)
+
+        public async Task<IEnumerable<User>> GetAll()
         {
-            return DbContext.Users.Where(user => user.UserName == userName)
-                                  .FirstOrDefault();
+            return await _context.Users.ToListAsync();
+
         }
 
-        public async Task<List<User>> FindAll()
+        public async Task<User> GetById(int id)
         {
-            return await DbContext.Users.ToListAsync();
+            return await _context.Users.FirstOrDefaultAsync(r => r.Id == id);
+
         }
 
-        public void Add(User user)
+        public async Task Update(User entity)
         {
+            var User = await _context.Users.FindAsync(entity.Id);
+            _context.Entry(User).State = EntityState.Detached;
+            _context.Users.Update(entity);
+            await _context.SaveChangesAsync();
         }
 
-        public User FindById(int id)
+        public async Task Delete(int id)
         {
-            return null;
+
+            var User = await _context.Users.FindAsync(id);
+            _context.Users.Remove(User);
+            await _context.SaveChangesAsync();
+
+
         }
     }
 }
