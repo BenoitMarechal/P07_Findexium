@@ -5,9 +5,11 @@ using Dot.Net.WebApi.Controllers;
 
 namespace Dot.Net.WebApi.Data
 {
+    // passer en identityDBContext
     public class LocalDbContext : DbContext
     {
-        public LocalDbContext(DbContextOptions<LocalDbContext> options) : base(options) { }
+        public LocalDbContext(DbContextOptions<LocalDbContext> options) : base(options) {
+        }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

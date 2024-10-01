@@ -1,7 +1,10 @@
+using Dot.Net.WebApi.Controllers.Domain;
 using Dot.Net.WebApi.Data;
+using Dot.Net.WebApi.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Dot.Net.WebApi.Domain;
+using P7CreateRestApi.Services;
+using P7CreateRestApi.Repositories;
 
 namespace Dot.Net.WebApi.Controllers
 {
@@ -9,97 +12,133 @@ namespace Dot.Net.WebApi.Controllers
     [Route("api/v1/[controller]")]
     public class TradeController : ControllerBase
     {
-        // TODO: Inject Trade service
-        private readonly LocalDbContext _context;
+        private readonly TradeService _service;
+        private readonly ILogger<TradeController> _logger;
 
-        public TradeController(LocalDbContext context)
+        public TradeController(TradeService service, ILogger<TradeController> logger)
         {
-            _context = context;
+            _service = service;
+            _logger = logger;
         }
 
+        // POST: api/v1/bidlist
         [HttpPost]
         public async Task<IActionResult> AddTrade([FromBody] Trade trade)
         {
-            _context.Trades.Add(trade);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetTrade), new { id = trade.TradeId }, trade);
-
+            try
+            {
+                await _service.Add(trade);
+                return CreatedAtAction(nameof(GetTrade), new { id = trade.TradeId }, trade);
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "A database error occurred while adding the Trade.");
+                return StatusCode(500, "A database error occurred while adding the Trade.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                return StatusCode(500, "An unexpected error occurred while processing your request.");
+            }
         }
 
-
+        // GET: api/v1/bidlist
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Trade>>> GetAllTrades()
         {
-            return await _context.Trades.ToListAsync();
+            try
+            {
+                var result = await _service.GetAll();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                return StatusCode(500, "An unexpected error occurred while processing your request.");
+            }
         }
 
-
-        [HttpGet]
-        [Route("{id}")]
+        // GET: api/v1/bidlist/{id}
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetTrade(int id)
         {
-            // TODO: find all Trade, add to model
-            var trade = await _context.Trades.FindAsync(id);
-            if (trade == null)
+            try
             {
-                return NotFound();
+                var trade = await _service.GetById(id);
+                return Ok(trade);
             }
-            return Ok(trade);
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogError(ex, $"Trade with ID {id} not found.");
+                return NotFound($"Trade with ID {id} not found.");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "A database error occurred while fetching the Trade.");
+                return StatusCode(500, "A database error occurred while fetching the Trade.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                return StatusCode(500, "An unexpected error occurred while processing your request.");
+            }
         }
 
-
-        [HttpPut]
-        [Route("{id}")]
+        // PUT: api/v1/bidlist/{id}
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTrade(int id, [FromBody] Trade trade)
         {
             if (id != trade.TradeId)
             {
-                return BadRequest();
+                return BadRequest("The ID from the route and the ID in the body do not match.");
             }
-
-            _context.Entry(trade).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _service.Update(trade);
+                return Ok();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (KeyNotFoundException ex)
             {
-                if (!TradeExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                _logger.LogError(ex, $"Trade with ID {id} not found.");
+                return NotFound($"Trade with ID {id} not found.");
             }
-
-            return NoContent();
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "A database error occurred while updating the Trade.");
+                return StatusCode(500, "A database error occurred while updating the Trade.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                return StatusCode(500, "An unexpected error occurred while processing your request.");
+            }
         }
 
-
-        [HttpDelete]
-        [Route("{id}")]
+        // DELETE: api/v1/bidlist/{id}
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTrade(int id)
         {
-            var trade = await _context.Trades.FindAsync(id);
-            if (trade == null)
+            try
             {
-                return NotFound();
+                await _service.Delete(id);
+                return NoContent();
             }
-
-            _context.Trades.Remove(trade);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogError(ex, $"Trade with ID {id} not found.");
+                return NotFound($"Trade with ID {id} not found.");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "A database error occurred while deleting the Trade.");
+                return StatusCode(500, "A database error occurred while deleting the Trade.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                return StatusCode(500, "An unexpected error occurred while processing your request.");
+            }
         }
-
-
-        private bool TradeExists(int id)
-        {
-            return _context.Trades.Any(e => e.TradeId == id);
-        }
-
     }
 }

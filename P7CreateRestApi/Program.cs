@@ -1,5 +1,7 @@
+using Dot.Net.WebApi.Controllers;
 using Dot.Net.WebApi.Controllers.Domain;
 using Dot.Net.WebApi.Data;
+using Dot.Net.WebApi.Domain;
 using Microsoft.EntityFrameworkCore;
 using P7CreateRestApi.Repositories;
 using P7CreateRestApi.Services;
@@ -16,8 +18,22 @@ builder.Services.AddSwaggerGen();
 
 //Injection de dépendences
 builder.Services.AddScoped<IRepository<Rating>, RatingRepository>();
-
 builder.Services.AddScoped<RatingService>();
+
+builder.Services.AddScoped<BidListService>();
+builder.Services.AddScoped<IRepository<BidList>, BidListRepository>();
+
+builder.Services.AddScoped<CurvePointService>();
+builder.Services.AddScoped<IRepository<CurvePoint>, CurvePointRepository>();
+
+builder.Services.AddScoped<RuleNameService>();
+builder.Services.AddScoped<IRepository<RuleName>, RuleNameRepository>();
+
+builder.Services.AddScoped<TradeService>();
+builder.Services.AddScoped<IRepository<Trade>, TradeRepository>();
+
+builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IRepository<User>, UserRepository>();
 
 builder.Services.AddDbContext<LocalDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));

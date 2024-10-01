@@ -1,7 +1,10 @@
+using Dot.Net.WebApi.Controllers.Domain;
 using Dot.Net.WebApi.Data;
+using Dot.Net.WebApi.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Dot.Net.WebApi.Domain;
+using P7CreateRestApi.Services;
+using P7CreateRestApi.Repositories;
 
 namespace Dot.Net.WebApi.Controllers
 {
@@ -9,97 +12,133 @@ namespace Dot.Net.WebApi.Controllers
     [Route("api/v1/[controller]")]
     public class UserController : ControllerBase
     {
-        // TODO: Inject User service
-        private readonly LocalDbContext _context;
+        private readonly UserService _service;
+        private readonly ILogger<UserController> _logger;
 
-        public UserController(LocalDbContext context)
+        public UserController(UserService service, ILogger<UserController> logger)
         {
-            _context = context;
+            _service = service;
+            _logger = logger;
         }
 
+        // POST: api/v1/bidlist
         [HttpPost]
         public async Task<IActionResult> AddUser([FromBody] User user)
         {
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
-
+            try
+            {
+                await _service.Add(user);
+                return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "A database error occurred while adding the User.");
+                return StatusCode(500, "A database error occurred while adding the User.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                return StatusCode(500, "An unexpected error occurred while processing your request.");
+            }
         }
 
-
+        // GET: api/v1/bidlist
         [HttpGet]
         public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
         {
-            return await _context.Users.ToListAsync();
+            try
+            {
+                var result = await _service.GetAll();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                return StatusCode(500, "An unexpected error occurred while processing your request.");
+            }
         }
 
-
-        [HttpGet]
-        [Route("{id}")]
+        // GET: api/v1/bidlist/{id}
+        [HttpGet("{id}")]
         public async Task<IActionResult> GetUser(int id)
         {
-            // TODO: find all User, add to model
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            try
             {
-                return NotFound();
+                var user = await _service.GetById(id);
+                return Ok(user);
             }
-            return Ok(user);
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogError(ex, $"User with ID {id} not found.");
+                return NotFound($"User with ID {id} not found.");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "A database error occurred while fetching the User.");
+                return StatusCode(500, "A database error occurred while fetching the User.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                return StatusCode(500, "An unexpected error occurred while processing your request.");
+            }
         }
 
-
-        [HttpPut]
-        [Route("{id}")]
+        // PUT: api/v1/bidlist/{id}
+        [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUser(int id, [FromBody] User user)
         {
             if (id != user.Id)
             {
-                return BadRequest();
+                return BadRequest("The ID from the route and the ID in the body do not match.");
             }
-
-            _context.Entry(user).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _service.Update(user);
+                return Ok();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (KeyNotFoundException ex)
             {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                _logger.LogError(ex, $"User with ID {id} not found.");
+                return NotFound($"User with ID {id} not found.");
             }
-
-            return NoContent();
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "A database error occurred while updating the User.");
+                return StatusCode(500, "A database error occurred while updating the User.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                return StatusCode(500, "An unexpected error occurred while processing your request.");
+            }
         }
 
-
-        [HttpDelete]
-        [Route("{id}")]
+        // DELETE: api/v1/bidlist/{id}
+        [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            try
             {
-                return NotFound();
+                await _service.Delete(id);
+                return NoContent();
             }
-
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-
-            return NoContent();
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogError(ex, $"User with ID {id} not found.");
+                return NotFound($"User with ID {id} not found.");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "A database error occurred while deleting the User.");
+                return StatusCode(500, "A database error occurred while deleting the User.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                return StatusCode(500, "An unexpected error occurred while processing your request.");
+            }
         }
-
-
-        private bool UserExists(int id)
-        {
-            return _context.Users.Any(e => e.Id == id);
-        }
-
     }
 }

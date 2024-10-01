@@ -10,12 +10,12 @@ namespace Dot.Net.WebApi.Controllers
 {
     [ApiController]
     [Route("api/v1/[controller]")]
-    public class BidListController : ControllerBase
+    public class CurvePointController : ControllerBase
     {
-        private readonly BidListService _service;
-        private readonly ILogger<BidListController> _logger;
+        private readonly CurvePointService _service;
+        private readonly ILogger<CurvePointController> _logger;
 
-        public BidListController(BidListService service, ILogger<BidListController> logger)
+        public CurvePointController(CurvePointService service, ILogger<CurvePointController> logger)
         {
             _service = service;
             _logger = logger;
@@ -23,17 +23,17 @@ namespace Dot.Net.WebApi.Controllers
 
         // POST: api/v1/bidlist
         [HttpPost]
-        public async Task<IActionResult> AddBidList([FromBody] BidList bidList)
+        public async Task<IActionResult> AddCurvePoint([FromBody] CurvePoint curvePoint)
         {
             try
             {
-                await _service.Add(bidList);
-                return CreatedAtAction(nameof(GetBidList), new { id = bidList.BidListId }, bidList);
+                await _service.Add(curvePoint);
+                return CreatedAtAction(nameof(GetCurvePoint), new { id = curvePoint.Id }, curvePoint);
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "A database error occurred while adding the BidList.");
-                return StatusCode(500, "A database error occurred while adding the BidList.");
+                _logger.LogError(ex, "A database error occurred while adding the CurvePoint.");
+                return StatusCode(500, "A database error occurred while adding the CurvePoint.");
             }
             catch (Exception ex)
             {
@@ -44,7 +44,7 @@ namespace Dot.Net.WebApi.Controllers
 
         // GET: api/v1/bidlist
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<BidList>>> GetAllBidLists()
+        public async Task<ActionResult<IEnumerable<CurvePoint>>> GetAllCurvePoints()
         {
             try
             {
@@ -60,22 +60,22 @@ namespace Dot.Net.WebApi.Controllers
 
         // GET: api/v1/bidlist/{id}
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetBidList(int id)
+        public async Task<IActionResult> GetCurvePoint(int id)
         {
             try
             {
-                var bidList = await _service.GetById(id);
-                return Ok(bidList);
+                var curvePoint = await _service.GetById(id);
+                return Ok(curvePoint);
             }
             catch (KeyNotFoundException ex)
             {
-                _logger.LogError(ex, $"BidList with ID {id} not found.");
-                return NotFound($"BidList with ID {id} not found.");
+                _logger.LogError(ex, $"CurvePoint with ID {id} not found.");
+                return NotFound($"CurvePoint with ID {id} not found.");
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "A database error occurred while fetching the BidList.");
-                return StatusCode(500, "A database error occurred while fetching the BidList.");
+                _logger.LogError(ex, "A database error occurred while fetching the CurvePoint.");
+                return StatusCode(500, "A database error occurred while fetching the CurvePoint.");
             }
             catch (Exception ex)
             {
@@ -86,27 +86,27 @@ namespace Dot.Net.WebApi.Controllers
 
         // PUT: api/v1/bidlist/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateBidList(int id, [FromBody] BidList bidList)
+        public async Task<IActionResult> UpdateCurvePoint(int id, [FromBody] CurvePoint curvePoint)
         {
-            if (id != bidList.BidListId)
+            if (id != curvePoint.Id)
             {
                 return BadRequest("The ID from the route and the ID in the body do not match.");
             }
 
             try
             {
-                await _service.Update(bidList);
+                await _service.Update(curvePoint);
                 return Ok();
             }
             catch (KeyNotFoundException ex)
             {
-                _logger.LogError(ex, $"BidList with ID {id} not found.");
-                return NotFound($"BidList with ID {id} not found.");
+                _logger.LogError(ex, $"CurvePoint with ID {id} not found.");
+                return NotFound($"CurvePoint with ID {id} not found.");
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "A database error occurred while updating the BidList.");
-                return StatusCode(500, "A database error occurred while updating the BidList.");
+                _logger.LogError(ex, "A database error occurred while updating the CurvePoint.");
+                return StatusCode(500, "A database error occurred while updating the CurvePoint.");
             }
             catch (Exception ex)
             {
@@ -117,7 +117,7 @@ namespace Dot.Net.WebApi.Controllers
 
         // DELETE: api/v1/bidlist/{id}
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteBidList(int id)
+        public async Task<IActionResult> DeleteCurvePoint(int id)
         {
             try
             {
@@ -126,13 +126,13 @@ namespace Dot.Net.WebApi.Controllers
             }
             catch (KeyNotFoundException ex)
             {
-                _logger.LogError(ex, $"BidList with ID {id} not found.");
-                return NotFound($"BidList with ID {id} not found.");
+                _logger.LogError(ex, $"CurvePoint with ID {id} not found.");
+                return NotFound($"CurvePoint with ID {id} not found.");
             }
             catch (DbUpdateException ex)
             {
-                _logger.LogError(ex, "A database error occurred while deleting the BidList.");
-                return StatusCode(500, "A database error occurred while deleting the BidList.");
+                _logger.LogError(ex, "A database error occurred while deleting the CurvePoint.");
+                return StatusCode(500, "A database error occurred while deleting the CurvePoint.");
             }
             catch (Exception ex)
             {
