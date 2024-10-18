@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Dot.Net.WebApi.Controllers
 {
-    [Authorize]
+
     [ApiController]
     [Route("api/v1/[controller]")]
     public class BidListController : ControllerBase
@@ -45,7 +45,7 @@ namespace Dot.Net.WebApi.Controllers
         }
 
         // GET: api/v1/bidlist
-        
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BidList>>> GetAllBidLists()
         {

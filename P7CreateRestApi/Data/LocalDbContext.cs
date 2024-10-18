@@ -4,13 +4,14 @@ using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Dot.Net.WebApi.Domain;
 using Dot.Net.WebApi.Controllers.Domain;
 using Dot.Net.WebApi.Controllers;
+using Microsoft.AspNetCore.Identity;
 
 
 
 namespace Dot.Net.WebApi.Data
 {
     // passer en identityDBContext
-    public class LocalDbContext : IdentityDbContext
+    public class LocalDbContext : IdentityDbContext<IdentityUser>
     {
         public LocalDbContext(DbContextOptions<LocalDbContext> options) : 
             base(options) {

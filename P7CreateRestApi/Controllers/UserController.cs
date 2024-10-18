@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using P7CreateRestApi.Services;
 using P7CreateRestApi.Repositories;
 using Microsoft.AspNetCore.Identity;
+using P7CreateRestApi.Models;
 
 namespace Dot.Net.WebApi.Controllers
 {
@@ -13,28 +14,36 @@ namespace Dot.Net.WebApi.Controllers
     [Route("api/v1/[controller]")]
     public class UserController : ControllerBase
     {
+        private readonly UserManager<IdentityUser> _userManager;
         private readonly UserService _service;
         private readonly ILogger<UserController> _logger;
 
-        public UserController(UserService service, ILogger<UserController> logger)
+        public UserController(UserService service, ILogger<UserController> logger, UserManager<IdentityUser> userManager)
         {
             _service = service;
             _logger = logger;
+            _userManager = userManager;
         }
 
-        // POST: api/v1/user
+        // Your user registration method
         [HttpPost]
-        public async Task<IActionResult> AddUser([FromBody] IdentityUser user)
+        public async Task<IActionResult> AddUser([FromBody] UserRegistrationRequest registrationRequest)
         {
+            var user = new IdentityUser
+            {
+                UserName = registrationRequest.Username,
+                Email = registrationRequest.Email // Optional
+            };
+
             try
             {
-                await _service.Add(user);
-                return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, "A database error occurred while adding the User.");
-                return StatusCode(500, "A database error occurred while adding the User.");
+                var result = await _userManager.CreateAsync(user, registrationRequest.Password);
+                if (result.Succeeded)
+                {
+                    return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+                }
+
+                return BadRequest(result.Errors);
             }
             catch (Exception ex)
             {
@@ -42,6 +51,62 @@ namespace Dot.Net.WebApi.Controllers
                 return StatusCode(500, "An unexpected error occurred while processing your request.");
             }
         }
+
+        //[HttpPost]
+        //public async Task<IActionResult> AddUser([FromBody] UserRegistrationRequest registrationRequest)
+        //{
+        //    var user = new IdentityUser
+        //    {
+        //        UserName = registrationRequest.Username,
+        //        Email = registrationRequest.Email // Optional
+        //    };
+
+        //    try
+        //    {
+        //        // Create the user with a hashed password
+        //        var result = await _userManager.CreateAsync(user, registrationRequest.Password);
+        //        if (result.Succeeded)
+        //        {
+        //            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+        //        }
+
+        //        // Return any errors if creation fails
+        //        return BadRequest(result.Errors);
+        //    }
+        //    catch (DbUpdateException ex)
+        //    {
+        //        _logger.LogError(ex, "A database error occurred while adding the User.");
+        //        return StatusCode(500, "A database error occurred while adding the User.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "An unexpected error occurred.");
+        //        return StatusCode(500, "An unexpected error occurred while processing your request.");
+        //    }
+        //}
+
+
+
+        //// POST: api/v1/user
+        //[HttpPost]
+        //public async Task<IActionResult> AddUser([FromBody] IdentityUser user)
+        //{
+        //    try
+        //    {
+        //        await _service.Add(user);
+        //        return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+        //    }
+        //    catch (DbUpdateException ex)
+        //    {
+        //        _logger.LogError(ex, "A database error occurred while adding the User.");
+        //        return StatusCode(500, "A database error occurred while adding the User.");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "An unexpected error occurred.");
+        //        return StatusCode(500, "An unexpected error occurred while processing your request.");
+        //    }
+        //}
 
         // GET: api/v1/user
         [HttpGet]
