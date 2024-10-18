@@ -1,14 +1,19 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+
 using Dot.Net.WebApi.Domain;
 using Dot.Net.WebApi.Controllers.Domain;
 using Dot.Net.WebApi.Controllers;
 
+
+
 namespace Dot.Net.WebApi.Data
 {
     // passer en identityDBContext
-    public class LocalDbContext : DbContext
+    public class LocalDbContext : IdentityDbContext
     {
-        public LocalDbContext(DbContextOptions<LocalDbContext> options) : base(options) {
+        public LocalDbContext(DbContextOptions<LocalDbContext> options) : 
+            base(options) {
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
@@ -16,8 +21,7 @@ namespace Dot.Net.WebApi.Data
             base.OnModelCreating(builder);
         }
 
-        public DbSet<User> Users { get; set;}
-
+       // public DbSet<User> Users { get; set;}
         public DbSet<BidList> BidLists { get; set; }
         public DbSet<CurvePoint> CurvePoints { get; set; }
         public DbSet<Rating> Ratings { get; set; }

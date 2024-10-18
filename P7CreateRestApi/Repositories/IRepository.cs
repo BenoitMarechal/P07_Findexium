@@ -2,6 +2,8 @@
 {
     public interface IRepository<T>
     {
+        //Task<T> GetById<U>(U id);
+
         Task<T> GetById(int id);
         Task<IEnumerable<T>> GetAll() ;
         Task Add(T entity);

@@ -1,11 +1,12 @@
 ﻿using Dot.Net.WebApi.Controllers.Domain;
 using Dot.Net.WebApi.Data;
 using Dot.Net.WebApi.Domain;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace P7CreateRestApi.Repositories
 {
-    public class UserRepository : IRepository<User>
+    public class UserRepository : IRepository<IdentityUser>
     {
         private readonly LocalDbContext _context;
         private readonly ILogger<UserRepository> _logger;
@@ -17,7 +18,7 @@ namespace P7CreateRestApi.Repositories
             _logger = logger;
         }
 
-        public async Task Add(User entity)
+        public async Task Add(IdentityUser entity)
         {
             _context.Users.Add(entity);
             await _context.SaveChangesAsync();
@@ -25,19 +26,19 @@ namespace P7CreateRestApi.Repositories
 
 
 
-        public async Task<IEnumerable<User>> GetAll()
+        public async Task<IEnumerable<IdentityUser>> GetAll()
         {
             return await _context.Users.ToListAsync();
 
         }
 
-        public async Task<User> GetById(int id)
+        public async Task<IdentityUser> GetById(int id)
         {
-            return await _context.Users.FirstOrDefaultAsync(r => r.Id == id);
+            return await _context.Users.FirstOrDefaultAsync(r => r.Id == id.ToString());
 
         }
 
-        public async Task Update(User entity)
+        public async Task Update(IdentityUser entity)
         {
             var User = await _context.Users.FindAsync(entity.Id);
             _context.Entry(User).State = EntityState.Detached;
@@ -54,5 +55,10 @@ namespace P7CreateRestApi.Repositories
 
 
         }
+
+        //public Task<IdentityUser> GetById<U>(U id) where U : 
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }

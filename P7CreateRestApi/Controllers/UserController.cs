@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using P7CreateRestApi.Services;
 using P7CreateRestApi.Repositories;
+using Microsoft.AspNetCore.Identity;
 
 namespace Dot.Net.WebApi.Controllers
 {
@@ -21,9 +22,9 @@ namespace Dot.Net.WebApi.Controllers
             _logger = logger;
         }
 
-        // POST: api/v1/bidlist
+        // POST: api/v1/user
         [HttpPost]
-        public async Task<IActionResult> AddUser([FromBody] User user)
+        public async Task<IActionResult> AddUser([FromBody] IdentityUser user)
         {
             try
             {
@@ -42,9 +43,9 @@ namespace Dot.Net.WebApi.Controllers
             }
         }
 
-        // GET: api/v1/bidlist
+        // GET: api/v1/user
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> GetAllUsers()
+        public async Task<ActionResult<IEnumerable<IdentityUser>>> GetAllUsers()
         {
             try
             {
@@ -58,7 +59,7 @@ namespace Dot.Net.WebApi.Controllers
             }
         }
 
-        // GET: api/v1/bidlist/{id}
+        // GET: api/v1/user/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUser(int id)
         {
@@ -84,11 +85,11 @@ namespace Dot.Net.WebApi.Controllers
             }
         }
 
-        // PUT: api/v1/bidlist/{id}
+        // PUT: api/v1/user/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] User user)
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] IdentityUser user)
         {
-            if (id != user.Id)
+            if (id != int.Parse(user.Id))
             {
                 return BadRequest("The ID from the route and the ID in the body do not match.");
             }
@@ -115,7 +116,7 @@ namespace Dot.Net.WebApi.Controllers
             }
         }
 
-        // DELETE: api/v1/bidlist/{id}
+        // DELETE: api/v1/user/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(int id)
         {
