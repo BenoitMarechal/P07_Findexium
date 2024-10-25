@@ -3,32 +3,33 @@ using P7CreateRestApi.Repositories;
 using Dot.Net.WebApi.Controllers.Domain;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 
 namespace P7CreateRestApi.Services
 {
     public class UserService
     {
-        private readonly IRepository<User> _userRepository;
+        private readonly IRepository<IdentityUser> _userRepository;
 
-        public UserService(IRepository<User> userRepository)
+        public UserService(IRepository<IdentityUser> userRepository)
         {
             _userRepository = userRepository;
         }
 
         // Adds a new User entity to the repository
-        public async Task Add(User user)
+        public async Task Add(IdentityUser user)
         {
             await _userRepository.Add(user);
         }
 
         // Retrieves all User entities from the repository
-        public async Task<IEnumerable<User>> GetAll()
+        public async Task<IEnumerable<IdentityUser>> GetAll()
         {
             return await _userRepository.GetAll();
         }
 
         // Retrieves a User by its ID, throws KeyNotFoundException if not found
-        public async Task<User> GetById(int id)
+        public async Task<IdentityUser> GetById(int id)
         {
             var result = await _userRepository.GetById(id);
             if (result == null)
@@ -39,9 +40,9 @@ namespace P7CreateRestApi.Services
         }
 
         // Updates a User entity, throws KeyNotFoundException if not found
-        public async Task Update(User user)
+        public async Task Update(IdentityUser user)
         {
-            var existingUser = await _userRepository.GetById(user.Id);
+            var existingUser = await _userRepository.GetById(int.Parse(user.Id) );
             if (existingUser == null)
             {
                 throw new KeyNotFoundException($"User with ID {user.Id} not found.");
