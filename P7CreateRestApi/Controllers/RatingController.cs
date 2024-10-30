@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using P7CreateRestApi.Services;
 using P7CreateRestApi.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using P7CreateRestApi.Constants;
 
 namespace Dot.Net.WebApi.Controllers
 {
@@ -27,9 +28,11 @@ namespace Dot.Net.WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> AddRating([FromBody] Rating rating)
         {
+            _logger.LogInformation($"AddRating {rating.Id}");
             try
             {
                 await _service.Add(rating);
+                _logger.LogInformation($"Rating {rating.Id} sucessfully added");
                 return CreatedAtAction(nameof(GetRating), new { id = rating.Id }, rating);
             }
             catch (DbUpdateException ex)
@@ -48,9 +51,11 @@ namespace Dot.Net.WebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Rating>>> GetAllRatings()
         {
+            _logger.LogInformation($"GetAllRatings");
             try
             {
                 var result = await _service.GetAll();
+                _logger.LogInformation($"Sucessfully fetched all Ratings");
                 return Ok(result);
             }
             catch (Exception ex)
@@ -64,9 +69,11 @@ namespace Dot.Net.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetRating(int id)
         {
+            _logger.LogInformation($"GetRatingById {id}");
             try
             {
                 var rating = await _service.GetById(id);
+                _logger.LogInformation($"Sucessfully fetched Rating {rating.Id}");
                 return Ok(rating);
             }
             catch (KeyNotFoundException ex)
@@ -74,11 +81,7 @@ namespace Dot.Net.WebApi.Controllers
                 _logger.LogError(ex, $"Rating with ID {id} not found.");
                 return NotFound($"Rating with ID {id} not found.");
             }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, "A database error occurred while fetching the Rating.");
-                return StatusCode(500, "A database error occurred while fetching the Rating.");
-            }
+        
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected error occurred.");
@@ -90,14 +93,17 @@ namespace Dot.Net.WebApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateRating(int id, [FromBody] Rating rating)
         {
+            _logger.LogInformation($"UpdateRating {id}");
             if (id != rating.Id)
             {
-                return BadRequest("The ID from the route and the ID in the body do not match.");
+                _logger.LogError(Messages.NoMatchMessage);
+                return BadRequest(Messages.NoMatchMessage);
             }
 
             try
             {
                 await _service.Update(rating);
+                _logger.LogInformation($"Sucessfully updated Rating {rating.Id}");
                 return Ok();
             }
             catch (KeyNotFoundException ex)
@@ -121,9 +127,11 @@ namespace Dot.Net.WebApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRating(int id)
         {
+            _logger.LogInformation($"Delete Rating {id}");
             try
             {
                 await _service.Delete(id);
+                _logger.LogInformation($"Rating {id} successfully deleted");
                 return NoContent();
             }
             catch (KeyNotFoundException ex)

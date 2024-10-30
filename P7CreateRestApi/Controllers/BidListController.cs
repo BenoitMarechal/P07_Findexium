@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using P7CreateRestApi.Services;
 using P7CreateRestApi.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using P7CreateRestApi.Constants;
 
 namespace Dot.Net.WebApi.Controllers
 {
@@ -27,9 +28,11 @@ namespace Dot.Net.WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> AddBidList([FromBody] BidList bidList)
         {
+            _logger.LogInformation($"AddBidList {bidList.BidListId}");
             try
             {
                 await _service.Add(bidList);
+                _logger.LogInformation($"BidList {bidList.BidListId} sucessfully added");
                 return CreatedAtAction(nameof(GetBidList), new { id = bidList.BidListId }, bidList);
             }
             catch (DbUpdateException ex)
@@ -49,9 +52,11 @@ namespace Dot.Net.WebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BidList>>> GetAllBidLists()
         {
+            _logger.LogInformation($"GetAllBidLists");
             try
             {
                 var result = await _service.GetAll();
+                _logger.LogInformation($"Sucessfully fetched all BidLists");
                 return Ok(result);
             }
             catch (Exception ex)
@@ -65,9 +70,11 @@ namespace Dot.Net.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetBidList(int id)
         {
+            _logger.LogInformation($"GetBidListById {id}");
             try
             {
                 var bidList = await _service.GetById(id);
+                _logger.LogInformation($"Sucessfully fetched BidList {bidList.BidListId}");
                 return Ok(bidList);
             }
             catch (KeyNotFoundException ex)
@@ -75,11 +82,7 @@ namespace Dot.Net.WebApi.Controllers
                 _logger.LogError(ex, $"BidList with ID {id} not found.");
                 return NotFound($"BidList with ID {id} not found.");
             }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, "A database error occurred while fetching the BidList.");
-                return StatusCode(500, "A database error occurred while fetching the BidList.");
-            }
+           
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected error occurred.");
@@ -91,14 +94,17 @@ namespace Dot.Net.WebApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBidList(int id, [FromBody] BidList bidList)
         {
+            _logger.LogInformation($"UpdateBidList {id}");
             if (id != bidList.BidListId)
-            {
-                return BadRequest("The ID from the route and the ID in the body do not match.");
+            {                
+                _logger.LogError(Messages.NoMatchMessage);
+                return BadRequest(Messages.NoMatchMessage);
             }
 
             try
             {
                 await _service.Update(bidList);
+                _logger.LogInformation($"Sucessfully updated BidList {bidList.BidListId}");
                 return Ok();
             }
             catch (KeyNotFoundException ex)
@@ -122,9 +128,11 @@ namespace Dot.Net.WebApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBidList(int id)
         {
+            _logger.LogInformation($"Delete BidList {id}");
             try
             {
                 await _service.Delete(id);
+                _logger.LogInformation($"BidList {id} successfully deleted");
                 return NoContent();
             }
             catch (KeyNotFoundException ex)

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using P7CreateRestApi.Services;
 using P7CreateRestApi.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using P7CreateRestApi.Constants;
 
 namespace Dot.Net.WebApi.Controllers
 {
@@ -27,9 +28,11 @@ namespace Dot.Net.WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> AddTrade([FromBody] Trade trade)
         {
+            _logger.LogInformation($"AddTrade {trade.TradeId}");
             try
             {
                 await _service.Add(trade);
+                _logger.LogInformation($"Trade {trade.TradeId} sucessfully added");
                 return CreatedAtAction(nameof(GetTrade), new { id = trade.TradeId }, trade);
             }
             catch (DbUpdateException ex)
@@ -48,9 +51,11 @@ namespace Dot.Net.WebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Trade>>> GetAllTrades()
         {
+            _logger.LogInformation($"GetAllTrades");
             try
             {
                 var result = await _service.GetAll();
+                _logger.LogInformation("All trades fetched successfully");
                 return Ok(result);
             }
             catch (Exception ex)
@@ -64,9 +69,11 @@ namespace Dot.Net.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetTrade(int id)
         {
+            _logger.LogInformation($"GetTradeById {id}");
             try
             {
                 var trade = await _service.GetById(id);
+                _logger.LogInformation($"Bidlists ${id} fetched successfully");
                 return Ok(trade);
             }
             catch (KeyNotFoundException ex)
@@ -74,11 +81,7 @@ namespace Dot.Net.WebApi.Controllers
                 _logger.LogError(ex, $"Trade with ID {id} not found.");
                 return NotFound($"Trade with ID {id} not found.");
             }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, "A database error occurred while fetching the Trade.");
-                return StatusCode(500, "A database error occurred while fetching the Trade.");
-            }
+         
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected error occurred.");
@@ -90,14 +93,17 @@ namespace Dot.Net.WebApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateTrade(int id, [FromBody] Trade trade)
         {
+            _logger.LogInformation($"UpdateTrade {id}");
             if (id != trade.TradeId)
             {
-                return BadRequest("The ID from the route and the ID in the body do not match.");
+                _logger.LogError(Messages.NoMatchMessage);
+                return BadRequest(Messages.NoMatchMessage);
             }
 
             try
             {
                 await _service.Update(trade);
+                _logger.LogInformation($"Sucessfully updated Trade {trade.TradeId}");
                 return Ok();
             }
             catch (KeyNotFoundException ex)
@@ -121,9 +127,11 @@ namespace Dot.Net.WebApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTrade(int id)
         {
+            _logger.LogInformation($"Delete Trade {id}");
             try
             {
                 await _service.Delete(id);
+                _logger.LogInformation($"Trade {id} successfully deleted");
                 return NoContent();
             }
             catch (KeyNotFoundException ex)

@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity; // Add this if not already present
+﻿using Microsoft.AspNetCore.Identity; 
  using Microsoft.AspNetCore.Mvc;
-// using Auth0.ManagementApi.Models.Rules;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using P7CreateRestApi.Models;
-using System.Net; // Make sure to import your LoginRequest model
-// Other usings...
+using System.Net;
+using P7CreateRestApi.Constants; 
+
 
 namespace P7CreateRestApi.Controllers
 {
@@ -15,13 +15,13 @@ namespace P7CreateRestApi.Controllers
     public class LoginController : ControllerBase
     {
         private readonly IConfiguration _config;
-        private readonly UserManager<IdentityUser> _userManager; // Inject UserManager
+        private readonly UserManager<IdentityUser> _userManager; 
         private readonly ILogger<LoginController> _logger;
 
         public LoginController(IConfiguration config, UserManager<IdentityUser> userManager, ILogger<LoginController> logger)
         {
             _config = config;
-            _userManager = userManager; // Initialize UserManager
+            _userManager = userManager; 
             _logger = logger;
     }
 
@@ -31,21 +31,26 @@ namespace P7CreateRestApi.Controllers
 
         public async Task<IActionResult> Post([FromBody] LoginRequest loginRequest)
         {
-            // Find user by username or email
+           
 
+            _logger.LogInformation($"Trying to log user {loginRequest.Username} in");
             try
             {
-                var user = await _userManager.FindByNameAsync(loginRequest.Username); // Or use FindByEmailAsync
+                var user = await _userManager.FindByNameAsync(loginRequest.Username); 
                 if (user == null)
                 {
-                    return Unauthorized("Incorrect user or password"); // User not found
+                    // User not found
+                    _logger.LogError(Messages.BadLoginMessage);
+                    return Unauthorized(Messages.BadLoginMessage); 
                 }
 
                 // Verify the password
                 var passwordCheck = await _userManager.CheckPasswordAsync(user, loginRequest.Password);
                 if (!passwordCheck)
                 {
-                    return Unauthorized("Incorrect user or password"); // Invalid password
+                    // Invalid password
+                    _logger.LogError(Messages.BadLoginMessage);
+                    return Unauthorized(Messages.BadLoginMessage); 
                 }
 
                 // Generate the token
@@ -61,7 +66,10 @@ namespace P7CreateRestApi.Controllers
 
                 var token = new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
 
-                return Ok(new { Token = token }); // Return the token }
+                _logger.LogInformation($"User {user.UserName} uscessfully logged in");
+
+                // Return the token
+                return Ok(new { Token = token }); 
             }
             catch (Exception e) {
                 _logger.LogError(e, e.Message);
