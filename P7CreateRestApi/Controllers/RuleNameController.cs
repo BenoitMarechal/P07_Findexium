@@ -1,11 +1,8 @@
-using Dot.Net.WebApi.Controllers.Domain;
-using Dot.Net.WebApi.Data;
-using Dot.Net.WebApi.Domain;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using P7CreateRestApi.Services;
-using P7CreateRestApi.Repositories;
 using Microsoft.AspNetCore.Authorization;
+using P7CreateRestApi.Constants;
 
 namespace Dot.Net.WebApi.Controllers
 {
@@ -27,9 +24,12 @@ namespace Dot.Net.WebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> AddRuleName([FromBody] RuleName ruleName)
         {
+            _logger.LogInformation($"AddRuleName {ruleName.Id}");
             try
+
             {
                 await _service.Add(ruleName);
+                _logger.LogInformation($"RuleName {ruleName.Id} sucessfully added");
                 return CreatedAtAction(nameof(GetRuleName), new { id = ruleName.Id }, ruleName);
             }
             catch (DbUpdateException ex)
@@ -48,9 +48,11 @@ namespace Dot.Net.WebApi.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<RuleName>>> GetAllRuleNames()
         {
+            _logger.LogInformation($"GetAllRuleNames");
             try
             {
                 var result = await _service.GetAll();
+                _logger.LogInformation($"Sucessfully fetched all RuleNames");
                 return Ok(result);
             }
             catch (Exception ex)
@@ -64,9 +66,11 @@ namespace Dot.Net.WebApi.Controllers
         [HttpGet("{id}")]
         public async Task<IActionResult> GetRuleName(int id)
         {
+            _logger.LogInformation($"GetRuleNameById {id}");
             try
             {
                 var ruleName = await _service.GetById(id);
+                _logger.LogInformation($"Sucessfully fetched RuleName {ruleName.Id}");
                 return Ok(ruleName);
             }
             catch (KeyNotFoundException ex)
@@ -74,11 +78,7 @@ namespace Dot.Net.WebApi.Controllers
                 _logger.LogError(ex, $"RuleName with ID {id} not found.");
                 return NotFound($"RuleName with ID {id} not found.");
             }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, "A database error occurred while fetching the RuleName.");
-                return StatusCode(500, "A database error occurred while fetching the RuleName.");
-            }
+         
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An unexpected error occurred.");
@@ -90,14 +90,17 @@ namespace Dot.Net.WebApi.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateRuleName(int id, [FromBody] RuleName ruleName)
         {
+            _logger.LogInformation($"UpdateRuleName {id}");
             if (id != ruleName.Id)
             {
-                return BadRequest("The ID from the route and the ID in the body do not match.");
+                _logger.LogError(Messages.NoMatchMessage);
+                return BadRequest(Messages.NoMatchMessage);
             }
 
             try
             {
                 await _service.Update(ruleName);
+                _logger.LogInformation($"Sucessfully updated RuleName {ruleName.Id}");
                 return Ok();
             }
             catch (KeyNotFoundException ex)
@@ -121,9 +124,11 @@ namespace Dot.Net.WebApi.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRuleName(int id)
         {
+            _logger.LogInformation($"Delete RuleName {id}");
             try
             {
                 await _service.Delete(id);
+                _logger.LogInformation($"RuleName {id} successfully deleted");
                 return NoContent();
             }
             catch (KeyNotFoundException ex)
