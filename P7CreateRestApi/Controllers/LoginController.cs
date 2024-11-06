@@ -66,7 +66,7 @@ namespace P7CreateRestApi.Controllers
 
                 var token = new JwtSecurityTokenHandler().WriteToken(tokenDescriptor);
 
-                _logger.LogInformation($"User {user.UserName} uscessfully logged in");
+                _logger.LogInformation($"User {user.UserName} successfully logged in");
 
                 // Return the token
                 return Ok(new { Token = token }); 
