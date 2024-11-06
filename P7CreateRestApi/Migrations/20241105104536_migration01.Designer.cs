@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace P7CreateRestApi.Migrations
 {
     [DbContext(typeof(LocalDbContext))]
-    [Migration("20241015130343_identity")]
-    partial class identity
+    [Migration("20241105104536_migration01")]
+    partial class migration01
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -26,11 +26,8 @@ namespace P7CreateRestApi.Migrations
 
             modelBuilder.Entity("Dot.Net.WebApi.Controllers.Domain.Rating", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("FitchRating")
                         .IsRequired()
@@ -54,11 +51,8 @@ namespace P7CreateRestApi.Migrations
 
             modelBuilder.Entity("Dot.Net.WebApi.Controllers.RuleName", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -91,11 +85,8 @@ namespace P7CreateRestApi.Migrations
 
             modelBuilder.Entity("Dot.Net.WebApi.Domain.BidList", b =>
                 {
-                    b.Property<int>("BidListId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("BidListId"), 1L, 1);
+                    b.Property<string>("BidListId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Account")
                         .IsRequired()
@@ -181,11 +172,8 @@ namespace P7CreateRestApi.Migrations
 
             modelBuilder.Entity("Dot.Net.WebApi.Domain.CurvePoint", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("AsOfDate")
                         .HasColumnType("datetime2");
@@ -209,11 +197,8 @@ namespace P7CreateRestApi.Migrations
 
             modelBuilder.Entity("Dot.Net.WebApi.Domain.Trade", b =>
                 {
-                    b.Property<int>("TradeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TradeId"), 1L, 1);
+                    b.Property<string>("TradeId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Account")
                         .IsRequired()
@@ -291,35 +276,6 @@ namespace P7CreateRestApi.Migrations
                     b.HasKey("TradeId");
 
                     b.ToTable("Trades");
-                });
-
-            modelBuilder.Entity("Dot.Net.WebApi.Domain.User", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("FullName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>

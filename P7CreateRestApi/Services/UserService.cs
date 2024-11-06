@@ -29,21 +29,21 @@ namespace P7CreateRestApi.Services
         }
 
         // Retrieves a User by its ID, throws KeyNotFoundException if not found
-        public async Task<IdentityUser> GetById(int id)
+        public async Task<IdentityUser> GetById(string id)
         {
             var result = await _userRepository.GetById(id);
             if (result == null)
             {
                 throw new KeyNotFoundException($"User with ID {id} not found.");
             }
+
             return result;
         }
 
         // Updates a User entity, throws KeyNotFoundException if not found
         public async Task Update(IdentityUser user)
         {
-            var existingUser = await _userRepository.GetById(int.Parse(user.Id) );
-            if (existingUser == null)
+            if (!await UserExists(user.Id))
             {
                 throw new KeyNotFoundException($"User with ID {user.Id} not found.");
             }
@@ -51,10 +51,10 @@ namespace P7CreateRestApi.Services
         }
 
         // Deletes a User by its ID, throws KeyNotFoundException if not found
-        public async Task Delete(int id)
+        public async Task Delete(string id)
         {
-            var existingUser = await _userRepository.GetById(id);
-            if (existingUser == null)
+    
+            if(! await UserExists(id))
             {
                 throw new KeyNotFoundException($"User with ID {id} not found.");
             }
@@ -62,7 +62,7 @@ namespace P7CreateRestApi.Services
         }
 
         // Checks if a User exists in the repository by ID
-        public async Task<bool> UserExists(int id)
+        public async Task<bool> UserExists(string id)
         {
             return await _userRepository.GetById(id) != null;
         }

@@ -32,9 +32,9 @@ namespace P7CreateRestApi.Repositories
 
         }
 
-        public async Task<IdentityUser> GetById(int id)
+        public async Task<IdentityUser> GetById(string id)
         {
-            return await _context.Users.FirstOrDefaultAsync(r => r.Id == id.ToString());
+            return await _context.Users.FirstOrDefaultAsync(r => r.Id == id);
 
         }
 
@@ -46,7 +46,7 @@ namespace P7CreateRestApi.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task Delete(int id)
+        public async Task Delete(string id)
         {
 
             var User = await _context.Users.FindAsync(id);
@@ -56,9 +56,22 @@ namespace P7CreateRestApi.Repositories
 
         }
 
-        //public Task<IdentityUser> GetById<U>(U id) where U : 
+      
+
+        //Task<IEnumerable<User>> IRepository<IdentityUser>.GetAll()
         //{
         //    throw new NotImplementedException();
         //}
+
+        public Task Add(User entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task Update(User entity)
+        {
+            throw new NotImplementedException();
+        }
+
     }
 }

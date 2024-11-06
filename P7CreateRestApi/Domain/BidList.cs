@@ -7,7 +7,7 @@ namespace Dot.Net.WebApi.Domain
     {
       
         [Key]
-        public int BidListId { get; set; }
+        public string BidListId { get; set; }
         [Required]
         public string Account { get; set; }
         [Required]

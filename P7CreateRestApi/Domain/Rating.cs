@@ -6,7 +6,7 @@ namespace Dot.Net.WebApi.Controllers.Domain
     {
        
         [Key]
-        public int Id { get; set; }
+        public string Id { get; set; }
         [Required]
         public string MoodysRating { get; set; }
         [Required]

@@ -28,10 +28,10 @@ namespace P7CreateRestApi.Services
         }
 
         // Retrieves a CurvePoint by its ID, throws KeyNotFoundException if not found
-        public async Task<CurvePoint> GetById(int id)
+        public async Task<CurvePoint> GetById(string id)
         {
             var result = await _curvePointRepository.GetById(id);
-            if (result == null)
+            if (!await CurvePointExists(id))
             {
                 throw new KeyNotFoundException($"CurvePoint with ID {id} not found.");
             }
@@ -41,8 +41,7 @@ namespace P7CreateRestApi.Services
         // Updates a CurvePoint entity, throws KeyNotFoundException if not found
         public async Task Update(CurvePoint curvePoint)
         {
-            var existingCurvePoint = await _curvePointRepository.GetById(curvePoint.Id);
-            if (existingCurvePoint == null)
+            if (!await CurvePointExists(curvePoint.Id))
             {
                 throw new KeyNotFoundException($"CurvePoint with ID {curvePoint.Id} not found.");
             }
@@ -50,18 +49,18 @@ namespace P7CreateRestApi.Services
         }
 
         // Deletes a CurvePoint by its ID, throws KeyNotFoundException if not found
-        public async Task Delete(int id)
+        public async Task Delete(string id)
         {
-            var existingCurvePoint = await _curvePointRepository.GetById(id);
-            if (existingCurvePoint == null)
+            if (!await CurvePointExists(id))
             {
                 throw new KeyNotFoundException($"CurvePoint with ID {id} not found.");
             }
+          
             await _curvePointRepository.Delete(id);
         }
 
         // Checks if a CurvePoint exists in the repository by ID
-        public async Task<bool> CurvePointExists(int id)
+        public async Task<bool> CurvePointExists(string id)
         {
             return await _curvePointRepository.GetById(id) != null;
         }

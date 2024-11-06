@@ -67,7 +67,7 @@ namespace Dot.Net.WebApi.Controllers
 
         // GET: api/v1/bidlist/{id}
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetTrade(int id)
+        public async Task<IActionResult> GetTrade(string id)
         {
             _logger.LogInformation($"GetTradeById {id}");
             try
@@ -91,7 +91,7 @@ namespace Dot.Net.WebApi.Controllers
 
         // PUT: api/v1/bidlist/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateTrade(int id, [FromBody] Trade trade)
+        public async Task<IActionResult> UpdateTrade(string id, [FromBody] Trade trade)
         {
             _logger.LogInformation($"UpdateTrade {id}");
             if (id != trade.TradeId)
@@ -125,7 +125,7 @@ namespace Dot.Net.WebApi.Controllers
 
         // DELETE: api/v1/bidlist/{id}
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTrade(int id)
+        public async Task<IActionResult> DeleteTrade(string id)
         {
             _logger.LogInformation($"Delete Trade {id}");
             try
