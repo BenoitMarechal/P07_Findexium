@@ -32,7 +32,9 @@ namespace Dot.Net.WebApi.Controllers
             var user = new IdentityUser
             {
                 UserName = registrationRequest.Username,
-                Email = registrationRequest.Email // Optional
+                Email = registrationRequest.Email,
+                 
+               
             };
 
             try
@@ -79,7 +81,7 @@ namespace Dot.Net.WebApi.Controllers
 
         // GET: api/v1/user/{id}
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetUser(int id)
+        public async Task<IActionResult> GetUser(string id)
         {
             _logger.LogInformation($"GetUserById {id}");
             try
@@ -103,11 +105,11 @@ namespace Dot.Net.WebApi.Controllers
 
         // PUT: api/v1/user/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(int id, [FromBody] IdentityUser user)
+        public async Task<IActionResult> UpdateUser(string id, [FromBody] IdentityUser user)
         {
             _logger.LogInformation($"UpdateUser {id}");
 
-            if (id != int.Parse(user.Id))
+            if (id != user.Id)
               //  if (id != user.Id)
 
             {
@@ -140,7 +142,7 @@ namespace Dot.Net.WebApi.Controllers
 
         // DELETE: api/v1/user/{id}
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        public async Task<IActionResult> DeleteUser(string id)
         {
             _logger.LogInformation($"Delete User {id}");
             try

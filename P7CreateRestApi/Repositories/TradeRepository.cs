@@ -31,7 +31,7 @@ namespace P7CreateRestApi.Repositories
 
         }
 
-        public async Task<Trade> GetById(int id)
+        public async Task<Trade> GetById(string id)
         {
             return await _context.Trades.FirstOrDefaultAsync(r => r.TradeId == id);
 
@@ -46,7 +46,7 @@ namespace P7CreateRestApi.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task Delete(int id)
+        public async Task Delete(string id)
         {
 
             var Trade = await _context.Trades.FindAsync(id);

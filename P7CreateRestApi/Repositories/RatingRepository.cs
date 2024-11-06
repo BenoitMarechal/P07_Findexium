@@ -31,7 +31,7 @@ namespace P7CreateRestApi.Repositories
 
         }
 
-        public async Task<Rating> GetById(int id)
+        public async Task<Rating> GetById(string id)
         {
             return await _context.Ratings.FirstOrDefaultAsync(r => r.Id == id);
 
@@ -46,7 +46,7 @@ namespace P7CreateRestApi.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task Delete(int id)
+        public async Task Delete(string id)
         {
 
             var Rating = await _context.Ratings.FindAsync(id);
