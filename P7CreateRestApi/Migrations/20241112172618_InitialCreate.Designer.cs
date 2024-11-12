@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace P7CreateRestApi.Migrations
 {
     [DbContext(typeof(LocalDbContext))]
-    [Migration("20241105104536_migration01")]
-    partial class migration01
+    [Migration("20241112172618_InitialCreate")]
+    partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

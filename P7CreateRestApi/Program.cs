@@ -15,6 +15,83 @@ using System.Text;
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
 
+async Task SeedRoles(IServiceProvider serviceProvider, ILogger logger)
+{
+    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+    string[] roleNames = { "Admin", "User" };
+
+    foreach (var roleName in roleNames)
+    {
+        if (!await roleManager.RoleExistsAsync(roleName))
+        {
+            var result = await roleManager.CreateAsync(new IdentityRole(roleName));
+            if (result.Succeeded)
+            {
+                logger.LogInformation($"Role '{roleName}' created successfully.");
+            }
+            else
+            {
+                logger.LogWarning($"Failed to create role '{roleName}': {string.Join(", ", result.Errors.Select(e => e.Description))}");
+            }
+        }
+        else
+        {
+            logger.LogInformation($"Role '{roleName}' already exists.");
+        }
+    }
+}
+
+async Task SeedUsers(IServiceProvider serviceProvider, ILogger logger)
+{
+    var userManager = serviceProvider.GetRequiredService<UserManager<IdentityUser>>();
+    var user = await userManager.FindByEmailAsync("admin@example.com");
+
+    if (user != null)
+    {
+        logger.LogInformation("Admin user already exists.");
+
+        // Check if the user is in the Admin role
+        var isInRole = await userManager.IsInRoleAsync(user, "Admin");
+        logger.LogInformation($"Is Admin user in 'Admin' role? {isInRole}");
+
+        if (!isInRole)
+        {
+            var addToRoleResult = await userManager.AddToRoleAsync(user, "Admin");
+            if (addToRoleResult.Succeeded)
+            {
+                logger.LogInformation("Admin user assigned to 'Admin' role successfully.");
+            }
+            else
+            {
+                logger.LogWarning($"Failed to assign role 'Admin' to user: {string.Join(", ", addToRoleResult.Errors.Select(e => e.Description))}");
+            }
+        }
+    }
+    else
+    {
+        user = new IdentityUser { UserName = "admin@example.com", Email = "admin@example.com" };
+        var createResult = await userManager.CreateAsync(user, "Password123!");
+
+        if (createResult.Succeeded)
+        {
+            logger.LogInformation("Admin user created successfully.");
+            var addToRoleResult = await userManager.AddToRoleAsync(user, "Admin");
+            if (addToRoleResult.Succeeded)
+            {
+                logger.LogInformation("Admin user assigned to 'Admin' role successfully.");
+            }
+            else
+            {
+                logger.LogWarning($"Failed to assign role 'Admin' to user: {string.Join(", ", addToRoleResult.Errors.Select(e => e.Description))}");
+            }
+        }
+        else
+        {
+            logger.LogWarning($"Failed to create admin user: {string.Join(", ", createResult.Errors.Select(e => e.Description))}");
+        }
+    }
+}
+
 // Add services to the container.
 
 builder.Services.AddControllers();
@@ -103,8 +180,19 @@ builder.Services.AddScoped<IRepository<Trade>, TradeRepository>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<IRepository<IdentityUser>, UserRepository>();
 
+//builder.Services.AddDbContext<LocalDbContext>(options =>
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddDbContext<LocalDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlOptions => sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,            // Number of retry attempts
+            maxRetryDelay: TimeSpan.FromSeconds(10),  // Delay between retries
+            errorNumbersToAdd: null      // Null lets it retry on all transient errors
+        )
+    )
+);
+
 
 
 builder.Services.ConfigureApplicationCookie(options =>
@@ -122,6 +210,18 @@ var app = builder.Build();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+
+using (var scope = app.Services.CreateScope())
+{
+    var scopedProvider = scope.ServiceProvider;
+    var logger = scopedProvider.GetRequiredService<ILogger<Program>>();
+
+    await SeedRoles(scopedProvider, logger);
+    await SeedUsers(scopedProvider, logger);
+}
+
+
+
 
 // Configure the HTTP request pipeline.
 

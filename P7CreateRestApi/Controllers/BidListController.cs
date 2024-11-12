@@ -48,7 +48,7 @@ namespace Dot.Net.WebApi.Controllers
         }
 
         // GET: api/v1/bidlist
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BidList>>> GetAllBidLists()
         {
