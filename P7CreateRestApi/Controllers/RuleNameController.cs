@@ -21,6 +21,7 @@ namespace Dot.Net.WebApi.Controllers
         }
 
         // POST: api/v1/bidlist
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> AddRuleName([FromBody] RuleName ruleName)
         {

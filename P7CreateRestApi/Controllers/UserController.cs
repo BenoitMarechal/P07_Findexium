@@ -4,6 +4,7 @@ using P7CreateRestApi.Services;
 using Microsoft.AspNetCore.Identity;
  using P7CreateRestApi.Models;
 using P7CreateRestApi.Constants;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace Dot.Net.WebApi.Controllers
@@ -23,7 +24,7 @@ namespace Dot.Net.WebApi.Controllers
             _userManager = userManager;
         }
 
-        // Your user registration method
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> AddUser([FromBody] UserRegistrationRequest registrationRequest)
         {

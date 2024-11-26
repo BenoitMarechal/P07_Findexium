@@ -5,7 +5,9 @@ using System.Text;
 using System.IdentityModel.Tokens.Jwt;
 using P7CreateRestApi.Models;
 using System.Net;
-using P7CreateRestApi.Constants; 
+using P7CreateRestApi.Constants;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace P7CreateRestApi.Controllers
@@ -25,7 +27,7 @@ namespace P7CreateRestApi.Controllers
             _logger = logger;
     }
 
-        [HttpPost]
+        [HttpPost]        
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized)]
 
@@ -53,14 +55,22 @@ namespace P7CreateRestApi.Controllers
                     return Unauthorized(Messages.BadLoginMessage); 
                 }
 
+                var authClaims = new List<Claim>
+    {
+        new Claim(ClaimTypes.Name, user.UserName),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+    };
+                var roles = await _userManager.GetRolesAsync(user);
+
+                authClaims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
                 // Generate the token
                 var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
                 var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
                 var tokenDescriptor = new JwtSecurityToken(
-                    _config["Jwt:Issuer"],
-                    _config["Jwt:Issuer"],
-                    null,
+                    issuer: _config["Jwt:Issuer"],
+                   audience: _config["Jwt:Issuer"],                    
+                    claims: authClaims,
                     expires: DateTime.Now.AddMinutes(120),
                     signingCredentials: credentials);
 
