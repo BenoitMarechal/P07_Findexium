@@ -46,7 +46,7 @@ namespace P7CreateRestApi.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task Delete(string id)
+        public async Task Delete(int id)
         {
 
             var Trade = await _context.Trades.FindAsync(id);

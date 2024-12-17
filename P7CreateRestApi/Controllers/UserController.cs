@@ -14,12 +14,11 @@ namespace Dot.Net.WebApi.Controllers
     public class UserController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly UserService _service;
         private readonly ILogger<UserController> _logger;
 
-        public UserController(UserService service, ILogger<UserController> logger, UserManager<IdentityUser> userManager)
+        public UserController(ILogger<UserController> logger, UserManager<IdentityUser> userManager)
         {
-            _service = service;
+          //  _service = service;
             _logger = logger;
             _userManager = userManager;
         }
@@ -69,7 +68,7 @@ namespace Dot.Net.WebApi.Controllers
             _logger.LogInformation($"GetAllUsers");
             try
             {
-                var result = await _service.GetAll();
+                var result = await _userManager.Users.ToListAsync();
                 _logger.LogInformation("All users sucessfully fetched");
                 return Ok(result);
             }
@@ -87,7 +86,7 @@ namespace Dot.Net.WebApi.Controllers
             _logger.LogInformation($"GetUserById {id}");
             try
             {
-                var user = await _service.GetById(id);
+                var user = await _userManager.FindByIdAsync(id);
                 _logger.LogInformation($"User {user.UserName} sucessfully fetched");
                 return Ok(user);
             }
@@ -120,7 +119,7 @@ namespace Dot.Net.WebApi.Controllers
 
             try
             {
-                await _service.Update(user);
+                 var result=  await _userManager.UpdateAsync(user);
                 _logger.LogInformation($"User {user.UserName} sucessfully updated");
                 return Ok();
             }
@@ -146,9 +145,14 @@ namespace Dot.Net.WebApi.Controllers
         public async Task<IActionResult> DeleteUser(string id)
         {
             _logger.LogInformation($"Delete User {id}");
+
+            
+           
+
             try
             {
-                await _service.Delete(id);
+                var targetUser = await _userManager.FindByIdAsync(id);
+                await _userManager.DeleteAsync(targetUser);
                 _logger.LogInformation($"User {id} successfully deleted");
                 return NoContent();
             }
