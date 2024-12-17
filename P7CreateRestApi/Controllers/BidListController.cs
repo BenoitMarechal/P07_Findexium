@@ -68,7 +68,7 @@ namespace Dot.Net.WebApi.Controllers
 
         // GET: api/v1/bidlist/{id}
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetBidList(string id)
+        public async Task<IActionResult> GetBidList(int id)
         {
             _logger.LogInformation($"GetBidListById {id}");
             try
@@ -92,7 +92,7 @@ namespace Dot.Net.WebApi.Controllers
 
         // PUT: api/v1/bidlist/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateBidList(string id, [FromBody] BidList bidList)
+        public async Task<IActionResult> UpdateBidList(int id, [FromBody] BidList bidList)
         {
             _logger.LogInformation($"UpdateBidList {id}");
             if (id != bidList.BidListId)
@@ -126,7 +126,7 @@ namespace Dot.Net.WebApi.Controllers
 
         // DELETE: api/v1/bidlist/{id}
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteBidList(string id)
+        public async Task<IActionResult> DeleteBidList(int id)
         {
             _logger.LogInformation($"Delete BidList {id}");
             try

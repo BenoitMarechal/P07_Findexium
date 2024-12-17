@@ -31,7 +31,7 @@ namespace P7CreateRestApi.Repositories
 
         }
 
-        public async Task<BidList> GetById(string id)
+        public async Task<BidList> GetById(int id)
         {
             return await _context.BidLists.FirstOrDefaultAsync(r => r.BidListId == id);
 
@@ -46,7 +46,7 @@ namespace P7CreateRestApi.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task Delete(string id)
+        public async Task Delete(int id)
         {
 
             var BidList = await _context.BidLists.FindAsync(id);    

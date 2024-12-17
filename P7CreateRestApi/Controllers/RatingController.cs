@@ -68,7 +68,7 @@ namespace Dot.Net.WebApi.Controllers
 
         // GET: api/v1/bidlist/{id}
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetRating(string id)
+        public async Task<IActionResult> GetRating(int id)
         {
             _logger.LogInformation($"GetRatingById {id}");
             try
@@ -92,7 +92,7 @@ namespace Dot.Net.WebApi.Controllers
 
         // PUT: api/v1/bidlist/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateRating(string id, [FromBody] Rating rating)
+        public async Task<IActionResult> UpdateRating(int id, [FromBody] Rating rating)
         {
             _logger.LogInformation($"UpdateRating {id}");
             if (id != rating.Id)
@@ -126,7 +126,7 @@ namespace Dot.Net.WebApi.Controllers
 
         // DELETE: api/v1/bidlist/{id}
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRating(string id)
+        public async Task<IActionResult> DeleteRating(int id)
         {
             _logger.LogInformation($"Delete Rating {id}");
             try

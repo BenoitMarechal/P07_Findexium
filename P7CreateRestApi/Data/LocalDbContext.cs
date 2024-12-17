@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Dot.Net.WebApi.Data
 {
-    // passer en identityDBContext
+   
     public class LocalDbContext : IdentityDbContext<IdentityUser>
     {
         public LocalDbContext(DbContextOptions<LocalDbContext> options) : 
@@ -22,7 +22,7 @@ namespace Dot.Net.WebApi.Data
             base.OnModelCreating(builder);
         }
 
-       // public DbSet<User> Users { get; set;}
+     
         public DbSet<BidList> BidLists { get; set; }
         public DbSet<CurvePoint> CurvePoints { get; set; }
         public DbSet<Rating> Ratings { get; set; }

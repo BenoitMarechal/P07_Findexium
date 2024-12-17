@@ -28,7 +28,7 @@ namespace P7CreateRestApi.Services
         }
 
         // Retrieves a Rating by its ID, throws KeyNotFoundException if not found
-        public async Task<Rating> GetById(string id)
+        public async Task<Rating> GetById(int id)
         {
             var result = await _ratingRepository.GetById(id);
             if (result == null)
@@ -49,7 +49,7 @@ namespace P7CreateRestApi.Services
         }
 
         // Deletes a Rating by its ID, throws KeyNotFoundException if not found
-        public async Task Delete(string id)
+        public async Task Delete(int id)
         {
             if (!await RatingExists(id))
             {
@@ -60,7 +60,7 @@ namespace P7CreateRestApi.Services
         }
 
         // Checks if a Rating exists in the repository by ID
-        public async Task<bool> RatingExists(string id)
+        public async Task<bool> RatingExists(int id)
         {
             return await _ratingRepository.GetById(id) != null;
         }

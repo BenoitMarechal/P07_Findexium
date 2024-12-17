@@ -29,7 +29,7 @@ namespace P7CreateRestApi.Services
         }
 
         // Retrieves a RuleName by its ID, throws KeyNotFoundException if not found
-        public async Task<RuleName> GetById(string id)
+        public async Task<RuleName> GetById(int id)
         {
             var result = await _ruleNameRepository.GetById(id);
             if (result == null)
@@ -50,7 +50,7 @@ namespace P7CreateRestApi.Services
         }
 
         // Deletes a RuleName by its ID, throws KeyNotFoundException if not found
-        public async Task Delete(string id)
+        public async Task Delete(int id)
         {
             if (!await RuleNameExists(id))
             {
@@ -61,7 +61,7 @@ namespace P7CreateRestApi.Services
         }
 
         // Checks if a RuleName exists in the repository by ID
-        public async Task<bool> RuleNameExists(string id)
+        public async Task<bool> RuleNameExists(int id)
         {
             return await _ruleNameRepository.GetById(id) != null;
         }

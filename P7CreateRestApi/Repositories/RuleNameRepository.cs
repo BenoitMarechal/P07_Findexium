@@ -32,7 +32,7 @@ namespace P7CreateRestApi.Repositories
 
         }
 
-        public async Task<RuleName> GetById(string id)
+        public async Task<RuleName> GetById(int id)
         {
             return await _context.RuleNames.FirstOrDefaultAsync(r => r.Id == id);
 
@@ -47,7 +47,7 @@ namespace P7CreateRestApi.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task Delete(string id)
+        public async Task Delete(int id)
         {
 
             var RuleName = await _context.RuleNames.FindAsync(id);

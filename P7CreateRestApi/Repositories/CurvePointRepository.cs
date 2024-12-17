@@ -31,7 +31,7 @@ namespace P7CreateRestApi.Repositories
 
         }
 
-        public async Task<CurvePoint> GetById(string id)
+        public async Task<CurvePoint> GetById(int id)
         {
             return await _context.CurvePoints.FirstOrDefaultAsync(r => r.Id == id);
 
@@ -46,7 +46,7 @@ namespace P7CreateRestApi.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task Delete(string id)
+        public async Task Delete(int id)
         {
 
             var CurvePoint = await _context.CurvePoints.FindAsync(id);
