@@ -138,9 +138,6 @@ namespace Dot.Net.WebApi.Controllers
         {
             _logger.LogInformation($"Delete User {id}");
 
-            
-           
-
             try
             {
                 var targetUser = await _userManager.FindByIdAsync(id);

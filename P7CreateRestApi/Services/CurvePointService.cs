@@ -31,7 +31,7 @@ namespace P7CreateRestApi.Services
         public async Task<CurvePoint> GetById(int id)
         {
             var result = await _curvePointRepository.GetById(id);
-            if (!await CurvePointExists(id))
+            if (result==null)
             {
                 throw new KeyNotFoundException($"CurvePoint with ID {id} not found.");
             }
