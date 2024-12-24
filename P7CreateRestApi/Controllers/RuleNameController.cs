@@ -65,7 +65,7 @@ namespace Dot.Net.WebApi.Controllers
 
         // GET: api/v1/bidlist/{id}
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetRuleName(string id)
+        public async Task<IActionResult> GetRuleName(int id)
         {
             _logger.LogInformation($"GetRuleNameById {id}");
             try
@@ -89,7 +89,7 @@ namespace Dot.Net.WebApi.Controllers
 
         // PUT: api/v1/bidlist/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateRuleName(string id, [FromBody] RuleName ruleName)
+        public async Task<IActionResult> UpdateRuleName(int id, [FromBody] RuleName ruleName)
         {
             _logger.LogInformation($"UpdateRuleName {id}");
             if (id != ruleName.Id)
@@ -123,7 +123,7 @@ namespace Dot.Net.WebApi.Controllers
 
         // DELETE: api/v1/bidlist/{id}
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteRuleName(string id)
+        public async Task<IActionResult> DeleteRuleName(int id)
         {
             _logger.LogInformation($"Delete RuleName {id}");
             try

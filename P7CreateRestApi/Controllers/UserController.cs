@@ -14,12 +14,11 @@ namespace Dot.Net.WebApi.Controllers
     public class UserController : ControllerBase
     {
         private readonly UserManager<IdentityUser> _userManager;
-        private readonly UserService _service;
         private readonly ILogger<UserController> _logger;
 
-        public UserController(UserService service, ILogger<UserController> logger, UserManager<IdentityUser> userManager)
+        public UserController(ILogger<UserController> logger, UserManager<IdentityUser> userManager)
         {
-            _service = service;
+          //  _service = service;
             _logger = logger;
             _userManager = userManager;
         }
@@ -69,7 +68,7 @@ namespace Dot.Net.WebApi.Controllers
             _logger.LogInformation($"GetAllUsers");
             try
             {
-                var result = await _service.GetAll();
+                var result = await _userManager.Users.ToListAsync();
                 _logger.LogInformation("All users sucessfully fetched");
                 return Ok(result);
             }
@@ -87,7 +86,7 @@ namespace Dot.Net.WebApi.Controllers
             _logger.LogInformation($"GetUserById {id}");
             try
             {
-                var user = await _service.GetById(id);
+                var user = await _userManager.FindByIdAsync(id);
                 _logger.LogInformation($"User {user.UserName} sucessfully fetched");
                 return Ok(user);
             }
@@ -104,41 +103,33 @@ namespace Dot.Net.WebApi.Controllers
             }
         }
 
-        // PUT: api/v1/user/{id}
+        // PUT: api/v1/user/{id} 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateUser(string id, [FromBody] IdentityUser user)
+        public async Task<IActionResult> UpdateUserPartial(string id, [FromBody] UpdateUserRequest request)
         {
-            _logger.LogInformation($"UpdateUser {id}");
-
-            if (id != user.Id)
-              //  if (id != user.Id)
-
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
             {
-                _logger.LogError(Messages.NoMatchMessage);
-                return BadRequest(Messages.NoMatchMessage);
+                return NotFound("User not found.");
             }
 
-            try
+            // Update fields only if they are not null
+            if (request.UserName != null) user.UserName = request.UserName;
+            if (request.Email != null) user.Email = request.Email;
+            if (request.PhoneNumber != null) user.PhoneNumber = request.PhoneNumber;
+            if (request.EmailConfirmed.HasValue) user.EmailConfirmed = request.EmailConfirmed.Value;
+            if (request.TwoFactorEnabled.HasValue) user.TwoFactorEnabled = request.TwoFactorEnabled.Value;
+            if (request.LockoutEnabled.HasValue) user.LockoutEnabled = request.LockoutEnabled.Value;
+            if (request.AccessFailedCount.HasValue) user.AccessFailedCount = request.AccessFailedCount.Value;
+
+            // Save changes
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
             {
-                await _service.Update(user);
-                _logger.LogInformation($"User {user.UserName} sucessfully updated");
-                return Ok();
+                return StatusCode(500, "Failed to update the user.");
             }
-            catch (KeyNotFoundException ex)
-            {
-                _logger.LogError(ex, $"User with ID {id} not found.");
-                return NotFound($"User with ID {id} not found.");
-            }
-            catch (DbUpdateException ex)
-            {
-                _logger.LogError(ex, "A database error occurred while updating the User.");
-                return StatusCode(500, "A database error occurred while updating the User.");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An unexpected error occurred.");
-                return StatusCode(500, "An unexpected error occurred while processing your request.");
-            }
+
+            return Ok("User updated successfully.");
         }
 
         // DELETE: api/v1/user/{id}
@@ -146,9 +137,11 @@ namespace Dot.Net.WebApi.Controllers
         public async Task<IActionResult> DeleteUser(string id)
         {
             _logger.LogInformation($"Delete User {id}");
+
             try
             {
-                await _service.Delete(id);
+                var targetUser = await _userManager.FindByIdAsync(id);
+                await _userManager.DeleteAsync(targetUser);
                 _logger.LogInformation($"User {id} successfully deleted");
                 return NoContent();
             }

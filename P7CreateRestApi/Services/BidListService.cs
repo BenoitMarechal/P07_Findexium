@@ -28,7 +28,7 @@ namespace P7CreateRestApi.Services
         }
 
         // Retrieves a BidList by its ID, throws KeyNotFoundException if not found
-        public async Task<BidList> GetById(string id)
+        public async Task<BidList> GetById(int id)
         {
             var result = await _bidListRepository.GetById(id);
             if (result == null)
@@ -50,7 +50,7 @@ namespace P7CreateRestApi.Services
         }
 
         // Deletes a BidList by its ID, throws KeyNotFoundException if not found
-        public async Task Delete(string id)
+        public async Task Delete(int id)
         {
          
             if (!await BidListExists(id))
@@ -63,7 +63,7 @@ namespace P7CreateRestApi.Services
         }
 
         // Checks if a BidList exists in the repository by ID
-        public async Task<bool> BidListExists(string id)
+        public async Task<bool> BidListExists(int id)
         {
             return await _bidListRepository.GetById(id) != null;
         }

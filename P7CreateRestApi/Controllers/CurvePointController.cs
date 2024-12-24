@@ -66,7 +66,7 @@ namespace Dot.Net.WebApi.Controllers
 
         // GET: api/v1/bidlist/{id}
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetCurvePoint(string id)
+        public async Task<IActionResult> GetCurvePoint(int id)
         {
             _logger.LogInformation($"GetCurvePointById {id}");
             try
@@ -90,7 +90,7 @@ namespace Dot.Net.WebApi.Controllers
 
         // PUT: api/v1/bidlist/{id}
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCurvePoint(string id, [FromBody] CurvePoint curvePoint)
+        public async Task<IActionResult> UpdateCurvePoint(int id, [FromBody] CurvePoint curvePoint)
         {
             _logger.LogInformation($"UpdateCurvePoint {id}");
 
@@ -125,7 +125,7 @@ namespace Dot.Net.WebApi.Controllers
 
         // DELETE: api/v1/bidlist/{id}
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCurvePoint(string id)
+        public async Task<IActionResult> DeleteCurvePoint(int id)
         {
             _logger.LogInformation($"Delete CurvePoint {id}");
             try

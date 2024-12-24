@@ -28,7 +28,7 @@ namespace P7CreateRestApi.Services
         }
 
         // Retrieves a Trade by its ID, throws KeyNotFoundException if not found
-        public async Task<Trade> GetById(string id)
+        public async Task<Trade> GetById(int id)
         {
             var result = await _tradeRepository.GetById(id);
             if (result == null)
@@ -49,7 +49,7 @@ namespace P7CreateRestApi.Services
         }
 
         // Deletes a Trade by its ID, throws KeyNotFoundException if not found
-        public async Task Delete(string id)
+        public async Task Delete(int id)
         {
         
             if(!await TradeExists(id)) {
@@ -62,7 +62,7 @@ namespace P7CreateRestApi.Services
         }
 
         // Checks if a Trade exists in the repository by ID
-        public async Task<bool> TradeExists(string id)
+        public async Task<bool> TradeExists(int id)
         {
             return await _tradeRepository.GetById(id) != null;
         }

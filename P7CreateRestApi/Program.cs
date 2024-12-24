@@ -203,8 +203,7 @@ builder.Services.AddScoped<IRepository<RuleName>, RuleNameRepository>();
 builder.Services.AddScoped<TradeService>();
 builder.Services.AddScoped<IRepository<Trade>, TradeRepository>();
 
-builder.Services.AddScoped<UserService>();
-builder.Services.AddScoped<IRepository<IdentityUser>, UserRepository>();
+
 builder.Services.AddScoped<IUserClaimsPrincipalFactory<IdentityUser>, CustomClaimsPrincipalFactory>();
 
 //builder.Services.AddDbContext<LocalDbContext>(options =>
