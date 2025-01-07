@@ -10,7 +10,7 @@ using P7CreateRestApi.Constants;
 
 namespace Dot.Net.WebApi.Controllers
 {
-
+    [Authorize]
     [ApiController]
     [Route("api/v1/[controller]")]
     public class BidListController : ControllerBase
@@ -49,7 +49,7 @@ namespace Dot.Net.WebApi.Controllers
         }
 
         // GET: api/v1/bidlist
-        [Authorize]
+        
         [HttpGet]
         public async Task<ActionResult<IEnumerable<BidList>>> GetAllBidLists()
         {
@@ -68,7 +68,7 @@ namespace Dot.Net.WebApi.Controllers
         }
 
         // GET: api/v1/bidlist/{id}
-        [Authorize]
+        
         [HttpGet("{id}")]
         public async Task<IActionResult> GetBidList(int id)
         {
@@ -93,7 +93,7 @@ namespace Dot.Net.WebApi.Controllers
         }
 
         // PUT: api/v1/bidlist/{id}
-        [Authorize]
+        
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateBidList(int id, [FromBody] BidList bidList)
         {
@@ -128,7 +128,7 @@ namespace Dot.Net.WebApi.Controllers
         }
 
         // DELETE: api/v1/bidlist/{id}
-        [Authorize]
+        
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBidList(int id)
         {

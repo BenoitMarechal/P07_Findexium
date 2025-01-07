@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace Dot.Net.WebApi.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/v1/[controller]")]
     public class UserController : ControllerBase
@@ -61,7 +62,6 @@ namespace Dot.Net.WebApi.Controllers
             }
         }
 
-        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<IdentityUser>>> GetAllUsers()
         {
@@ -80,7 +80,6 @@ namespace Dot.Net.WebApi.Controllers
         }
 
         
-        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUser(string id)
         {
@@ -104,7 +103,6 @@ namespace Dot.Net.WebApi.Controllers
             }
         }
 
-        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUserPartial(string id, [FromBody] UpdateUserRequest request)
         {
@@ -134,7 +132,6 @@ namespace Dot.Net.WebApi.Controllers
         }
 
         // DELETE: api/v1/user/{id}
-        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {
