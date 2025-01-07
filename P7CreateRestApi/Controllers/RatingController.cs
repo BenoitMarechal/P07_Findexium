@@ -1,59 +1,155 @@
 using Dot.Net.WebApi.Controllers.Domain;
+using Dot.Net.WebApi.Data;
+using Dot.Net.WebApi.Domain;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using P7CreateRestApi.Services;
+using P7CreateRestApi.Repositories;
+using Microsoft.AspNetCore.Authorization;
+using P7CreateRestApi.Constants;
 
 namespace Dot.Net.WebApi.Controllers
 {
+    [Authorize]
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/v1/[controller]")]
     public class RatingController : ControllerBase
     {
-        // TODO: Inject Rating service
+        private readonly RatingService _service;
+        private readonly ILogger<RatingController> _logger;
 
-        [HttpGet]
-        [Route("list")]
-        public IActionResult Home()
+        public RatingController(RatingService service, ILogger<RatingController> logger)
         {
-            // TODO: find all Rating, add to model
-            return Ok();
+            _service = service;
+            _logger = logger;
         }
 
-        [HttpGet]
-        [Route("add")]
-        public IActionResult AddRatingForm([FromBody]Rating rating)
-        {
-            return Ok();
-        }
-
-        [HttpGet]
-        [Route("validate")]
-        public IActionResult Validate([FromBody]Rating rating)
-        {
-            // TODO: check data valid and save to db, after saving return Rating list
-            return Ok();
-        }
-
-        [HttpGet]
-        [Route("update/{id}")]
-        public IActionResult ShowUpdateForm(int id)
-        {
-            // TODO: get Rating by Id and to model then show to the form
-            return Ok();
-        }
-
+        // POST: api/v1/bidlist
+        [Authorize(Roles = "Admin")]
         [HttpPost]
-        [Route("update/{id}")]
-        public IActionResult UpdateRating(int id, [FromBody] Rating rating)
+        public async Task<IActionResult> AddRating([FromBody] Rating rating)
         {
-            // TODO: check required fields, if valid call service to update Rating and return Rating list
-            return Ok();
+            _logger.LogInformation($"AddRating {rating.Id}");
+            try
+            {
+                await _service.Add(rating);
+                _logger.LogInformation($"Rating {rating.Id} sucessfully added");
+                return CreatedAtAction(nameof(GetRating), new { id = rating.Id }, rating);
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "A database error occurred while adding the Rating.");
+                return StatusCode(500, "A database error occurred while adding the Rating.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                return StatusCode(500, "An unexpected error occurred while processing your request.");
+            }
         }
 
-        [HttpDelete]
-        [Route("{id}")]
-        public IActionResult DeleteRating(int id)
+        // GET: api/v1/bidlist
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Rating>>> GetAllRatings()
         {
-            // TODO: Find Rating by Id and delete the Rating, return to Rating list
-            return Ok();
+            _logger.LogInformation($"GetAllRatings");
+            try
+            {
+                var result = await _service.GetAll();
+                _logger.LogInformation($"Sucessfully fetched all Ratings");
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                return StatusCode(500, "An unexpected error occurred while processing your request.");
+            }
+        }
+
+        // GET: api/v1/bidlist/{id}
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetRating(int id)
+        {
+            _logger.LogInformation($"GetRatingById {id}");
+            try
+            {
+                var rating = await _service.GetById(id);
+                _logger.LogInformation($"Sucessfully fetched Rating {rating.Id}");
+                return Ok(rating);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogError(ex, $"Rating with ID {id} not found.");
+                return NotFound($"Rating with ID {id} not found.");
+            }
+        
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                return StatusCode(500, "An unexpected error occurred while processing your request.");
+            }
+        }
+
+        // PUT: api/v1/bidlist/{id}
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateRating(int id, [FromBody] Rating rating)
+        {
+            _logger.LogInformation($"UpdateRating {id}");
+            if (id != rating.Id)
+            {
+                _logger.LogError(Messages.NoMatchMessage);
+                return BadRequest(Messages.NoMatchMessage);
+            }
+
+            try
+            {
+                await _service.Update(rating);
+                _logger.LogInformation($"Sucessfully updated Rating {rating.Id}");
+                return Ok();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogError(ex, $"Rating with ID {id} not found.");
+                return NotFound($"Rating with ID {id} not found.");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "A database error occurred while updating the Rating.");
+                return StatusCode(500, "A database error occurred while updating the Rating.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                return StatusCode(500, "An unexpected error occurred while processing your request.");
+            }
+        }
+
+        // DELETE: api/v1/bidlist/{id}
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteRating(int id)
+        {
+            _logger.LogInformation($"Delete Rating {id}");
+            try
+            {
+                await _service.Delete(id);
+                _logger.LogInformation($"Rating {id} successfully deleted");
+                return NoContent();
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogError(ex, $"Rating with ID {id} not found.");
+                return NotFound($"Rating with ID {id} not found.");
+            }
+            catch (DbUpdateException ex)
+            {
+                _logger.LogError(ex, "A database error occurred while deleting the Rating.");
+                return StatusCode(500, "A database error occurred while deleting the Rating.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unexpected error occurred.");
+                return StatusCode(500, "An unexpected error occurred while processing your request.");
+            }
         }
     }
 }
