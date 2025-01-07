@@ -18,7 +18,6 @@ namespace Dot.Net.WebApi.Controllers
 
         public UserController(ILogger<UserController> logger, UserManager<IdentityUser> userManager)
         {
-          //  _service = service;
             _logger = logger;
             _userManager = userManager;
         }
@@ -61,7 +60,8 @@ namespace Dot.Net.WebApi.Controllers
                 return StatusCode(500, "An unexpected error occurred while processing your request.");
             }
         }
-    
+
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<IdentityUser>>> GetAllUsers()
         {
@@ -79,7 +79,8 @@ namespace Dot.Net.WebApi.Controllers
             }
         }
 
-        // GET: api/v1/user/{id}
+        
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUser(string id)
         {
@@ -103,7 +104,7 @@ namespace Dot.Net.WebApi.Controllers
             }
         }
 
-        // PUT: api/v1/user/{id} 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateUserPartial(string id, [FromBody] UpdateUserRequest request)
         {
@@ -133,6 +134,7 @@ namespace Dot.Net.WebApi.Controllers
         }
 
         // DELETE: api/v1/user/{id}
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteUser(string id)
         {

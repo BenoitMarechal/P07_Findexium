@@ -49,6 +49,7 @@ namespace Dot.Net.WebApi.Controllers
         }
 
         // GET: api/v1/bidlist
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Rating>>> GetAllRatings()
         {
@@ -67,6 +68,7 @@ namespace Dot.Net.WebApi.Controllers
         }
 
         // GET: api/v1/bidlist/{id}
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetRating(int id)
         {
@@ -91,7 +93,7 @@ namespace Dot.Net.WebApi.Controllers
         }
 
         // PUT: api/v1/bidlist/{id}
-        [HttpPut("{id}")]
+        [Authorize]
         public async Task<IActionResult> UpdateRating(int id, [FromBody] Rating rating)
         {
             _logger.LogInformation($"UpdateRating {id}");
@@ -125,6 +127,7 @@ namespace Dot.Net.WebApi.Controllers
         }
 
         // DELETE: api/v1/bidlist/{id}
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRating(int id)
         {

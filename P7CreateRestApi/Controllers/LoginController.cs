@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace P7CreateRestApi.Controllers
 {
+    
     [Route("api/[controller]")]
     [ApiController]
     public class LoginController : ControllerBase
